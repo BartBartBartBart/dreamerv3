@@ -55,6 +55,22 @@ The code has been tested on Linux and Mac and requires Python 3.11+.
 You can either use the provided `Dockerfile` that contains instructions or
 follow the manual instructions below.
 
+To build the docker image, run (with sudo): 
+```sh
+docker build -f Dockerfile -t img .
+```
+Then, to create the container and run the application on atari pong, run:
+```sh
+docker run -it --gpus all --rm -v ~/logdir/docker:/logdir img \
+  python dreamerv3/main.py --logdir /logdir/{timestamp} --configs atari debug
+```
+For other tasks, check dreamer/v3/configs.yaml to see which flags to use. 
+
+If you update the Dockerfile or the contents of its build directory, you have to rebuild the docker image. This is done with: 
+```sh
+docker compose build
+```
+
 ## Manual
 
 Install [JAX][jax] and then the other dependencies:
