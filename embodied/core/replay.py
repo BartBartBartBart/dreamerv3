@@ -22,7 +22,7 @@ class Replay:
     self.chunksize = chunksize
     self.name = name
 
-    self.sampler = selector or selectors.Uniform(seed)
+    self.sampler = selector if selector is not None else selectors.Uniform(seed)
 
     self.chunks = {}
     self.refs = {}
@@ -128,10 +128,14 @@ class Replay:
 
   @elements.timer.section('replay_update')
   def update(self, data):
+    # info on data:
+    print("----------------------")
+    print('Replay update data:', data.keys())
     stepid = data.pop('stepid')
     priority = data.pop('priority', None)
     assert stepid.ndim == 3, stepid.shape
     self.metrics['updates'] += int(np.prod(stepid.shape[:-1]))
+    print("PRIORITY:", priority)
     if priority is not None:
       assert priority.ndim == 2, priority.shape
       self.sampler.prioritize(

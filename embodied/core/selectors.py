@@ -4,6 +4,40 @@ import threading
 import numpy as np
 
 
+class Uncertainty:
+  """
+  Select items with the highest uncertainty.
+  """
+
+  def __init__(self):
+    self.keys = []
+    self.uncertainty = []
+
+  def __call__(self):
+    index = np.argmax(self.uncertainty)
+    return self.keys[index]
+  
+  def __len__(self):
+    return len(self.keys)
+  
+  def __setitem__(self, key, model_pred, gt):
+    if key not in self.keys:
+      self.keys.append(key)
+      kl_div = self.calc_uncertainty(model_pred, gt)
+      self.uncertainty.append(kl_div)
+  
+  def __delitem__(self, key):
+    index = self.keys.index(key)
+    del self.keys[index]
+    del self.uncertainty[index]
+
+  def calc_uncertainty(self, model_pred, gt):
+    """
+    Calculate KL-divergence between model prediction and ground truth.
+    """
+    kl_div = np.sum(gt * (np.log(gt) - np.log(model_pred)))
+    return kl_div
+
 class Fifo:
 
   def __init__(self):
