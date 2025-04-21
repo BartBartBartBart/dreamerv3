@@ -4,6 +4,10 @@ from functools import partial as bind
 import elements
 import embodied
 import numpy as np
+import jax.numpy as jnp
+import jax
+from functools import partial
+import ninjax as nj
 
 
 def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
@@ -67,18 +71,54 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
   carry_train = [agent.init_train(args.batch_size)]
   carry_report = agent.init_report(args.batch_size)
 
-  def trainfn(tran, worker):
+  def trainfn(tran, worker, policy):
     if len(replay) < args.batch_size * args.batch_length:
       return
     for _ in range(should_train(step)):
       with elements.timer.section('stream_next'):
         batch = next(stream_train)
       carry_train[0], outs, mets = agent.train(carry_train[0], batch)
+
       train_fps.step(batch_steps)
       if 'replay' in outs:
         replay.update(outs['replay'])
+
+        print("--------------------------------------")
+        # print(carry_train[0][1].__dict__.keys())
+        # print(outs["replay"].keys())
+        world_model = agent.model.dyn
+
+        deter = jnp.asarray(outs["replay"]["dyn/deter"], dtype=jnp.float32)
+        stoch = jnp.asarray(outs["replay"]["dyn/stoch"], dtype=jnp.float32)
+
+        carry = ({
+            "deter": deter,
+            "stoch": stoch,
+        })
+        
+        # prevact = outs["replay"]["prevact"]
+
+        sample = lambda xs: jax.tree.map(lambda x: x.sample(nj.seed()), xs)
+
+        # policyfn = nj.pure(lambda feat: sample(agent.model.pol(agent.model.feat2tensor(feat), 1)))
+        def wrapped_policyfn(feat):
+          return sample(agent.model.pol(agent.model.feat2tensor(feat), 1))
+        policyfn = nj.pure(wrapped_policyfn)
+
+        carry, feat, act = world_model.imagine(
+            carry=carry,
+            policy=policyfn,
+            length=1,
+            training=True,
+            single=True,
+        )
+
+        print(f"Carry: {carry}")
+        print(f"Feat: {feat}")
+        print(f"Act: {act}")
+        print("-------------------------------")
+
       train_agg.add(mets, prefix='train')
-  driver.on_step(trainfn)
 
   cp = elements.Checkpoint(logdir / 'ckpt')
   cp.step = step
@@ -91,6 +131,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
   print('Start training loop')
   policy = lambda *args: agent.policy(*args, mode='train')
+  driver.on_step(partial(trainfn, policy=policy))
   driver.reset(agent.init_policy)
   while step < args.steps:
 

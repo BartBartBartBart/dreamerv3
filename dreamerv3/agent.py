@@ -113,6 +113,7 @@ class Agent(embodied.jax.Agent):
     return self.init_policy(batch_size)
 
   def policy(self, carry, obs, mode='train'):
+    # print("POLICY")
     (enc_carry, dyn_carry, dec_carry, prevact) = carry
     kw = dict(training=False, single=True)
     reset = obs['is_first']
@@ -150,6 +151,9 @@ class Agent(embodied.jax.Agent):
       outs['replay'] = updates
     # if self.config.replay.fracs.priority > 0:
     #   outs['replay']['priority'] = losses['model']
+    # outs['replay']["prevact"] = jax.tree.map(
+        # lambda x: x[:, -1], prevact)
+    
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics
 
