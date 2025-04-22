@@ -81,6 +81,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
       train_fps.step(batch_steps)
       if 'replay' in outs:
+        continue
         replay.update(outs['replay'])
 
         print("--------------------------------------")
