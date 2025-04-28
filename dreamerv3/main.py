@@ -198,10 +198,6 @@ def make_replay(config, folder, mode='train'):
   if config.replay.fracs.recency == 1 and mode == 'train':
     recency = 1.0 / np.arange(1, capacity + 1) ** config.replay.recexp
     kwargs['selector'] = embodied.replay.selectors.Recency(recency)
-    # print("--------------------------------------------------------")
-    # print("Using recency selector:")
-    # print(f"replay fractions: {config.replay.fracs}")
-    # print("--------------------------------------------------------")
 
   # Priority
   elif config.replay.fracs.priority == 1 and mode == 'train':
@@ -209,13 +205,9 @@ def make_replay(config, folder, mode='train'):
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
     kwargs['selector'] = embodied.replay.selectors.Prioritized(**config.replay.prio)
-    # print("--------------------------------------------------------")
-    # print("Using priority selector:")
-    # print(f"replay fractions: {config.replay.fracs}")
-    # print("--------------------------------------------------------")
 
   # Mixture
-  elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.recency != 0 and mode == 'train':
+  elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
@@ -226,11 +218,8 @@ def make_replay(config, folder, mode='train'):
         priority=selectors.Prioritized(**config.replay.prio),
         recency=selectors.Recency(recency),
     ), config.replay.fracs)
-    # print("--------------------------------------------------------")
-    # print("Using mixture of selectors:")
-    # print(f"replay fractions: {config.replay.fracs}")
-    # print("--------------------------------------------------------")
 
+  # print(kwargs)
   return embodied.replay.Replay(**kwargs)
 
 
