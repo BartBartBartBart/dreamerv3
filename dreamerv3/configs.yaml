@@ -39,7 +39,7 @@ defaults:
   replay:
     size: 5e6
     online: True
-    fracs: {uniform: 0.0, priority: 0.0, recency: 1.0}
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0}
     prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
     priosignal: model
     recexp: 1.0
@@ -161,8 +161,8 @@ dmlab:
 
 atari:
   task: atari_pong
-  run: {steps: 240, train_ratio: 32}
-  # run: {steps: 5.1e7, train_ratio: 32}
+  # run: {steps: 240, train_ratio: 32}
+  run: {steps: 5.1e7, train_ratio: 32}
 
 procgen:
   task: procgen_coinrun

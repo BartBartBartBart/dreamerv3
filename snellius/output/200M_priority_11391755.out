@@ -1,0 +1,970 @@
+============================================================================================== 
+Warning! Mixing Conda and module environments may lead to corruption of the
+user environment. 
+We do not recommend users mixing those two environments unless absolutely
+necessary. Note that 
+SURF does not provide any support for Conda environment.
+For more information, please refer to our software policy page:
+https://servicedesk.surf.nl/wiki/display/WIKI/Software+policy+Snellius#SoftwarepolicySnellius-UseofAnacondaandMinicondaenvironmentsonSnellius 
+
+Remember that many packages have already been installed on the system and can
+be loaded using 
+the 'module load <package__name>' command. If you are uncertain if a package is
+already available 
+on the system, please use 'module avail' or 'module spider' to search for it.
+============================================================================================== 
+A.L.E: Arcade Learning Environment (version 0.9.0+750d7f9)
+[Powered by Stella]
+---  ___                           __   ______ ---
+--- |   \ _ _ ___ __ _ _ __  ___ _ \ \ / /__ / ---
+--- | |) | '_/ -_) _` | '  \/ -_) '/\ V / |_ \ ---
+--- |___/|_| \___\__,_|_|_|_\___|_|  \_/ |___/ ---
+Replica: 0 / 1
+Logdir: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222
+Run script: train_eval
+Observations
+  image            Space(uint8, shape=(96, 96, 1), low=0, high=255)
+  reward           Space(float32, shape=(), low=-inf, high=inf)
+  is_first         Space(bool, shape=(), low=False, high=True)
+  is_last          Space(bool, shape=(), low=False, high=True)
+  is_terminal      Space(bool, shape=(), low=False, high=True)
+Actions
+  action           Space(int32, shape=(), low=0, high=18)
+Extras
+  consec           Space(int32, shape=(), low=-2147483648, high=2147483647)
+  stepid           Space(uint8, shape=(20,), low=0, high=255)
+  dyn/deter        Space(float32, shape=(8192,), low=-inf, high=inf)
+  dyn/stoch        Space(float32, shape=(32, 64), low=-inf, high=inf)
+JAX devices (1): [cuda:0]
+Policy devices: cuda:0
+Train devices:  cuda:0
+Initializing parameters...
+Optimizer opt has 186,936,082 params:
+   100,739,072 dyn
+    36,014,593 dec
+    12,850,431 val
+    12,607,506 pol
+    10,749,183 rew
+    10,488,833 con
+     3,486,464 enc
+Done initializing!
+Compiling 1 checkpoint groups...
+Largest checkpoint group: 2 GB
+Compiling train and report...
+Train cost analysis:
+  FLOPS:            4.7e+11
+  Memory (temp):    1.2e+10
+  Memory (inputs):  2.3e+09
+  Memory (outputs): 2.3e+09
+  Memory (code):    4.0e+06
+
+Report cost analysis:
+  FLOPS:            1.2e+10
+  Memory (temp):    1.5e+09
+  Memory (inputs):  5.9e+08
+  Memory (outputs): 2.2e+07
+  Memory (code):    6.1e+06
+
+Done compiling!
+Sampler: <embodied.core.selectors.Prioritized object at 0x14a372a64a90>
+Sampler: <embodied.core.selectors.Uniform object at 0x14a372ac6bd0>
+Logdir /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222
+Did not find any checkpoint.
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250425T231321F206991
+Saved checkpoint.
+Start training loop
+Evaluation
+
+--------------------[Agent Step 64]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 852 / replay/replay_ratio nan / fps/policy 161.05 / fps/train 0
+
+2025-04-25 23:14:24.150878: E external/xla/xla/python/profiler/internal/python_hooks.cc:400] Can't import tensorflow.python.profiler.trace
+2025-04-25 23:14:32.779655: E external/xla/xla/python/profiler/internal/python_hooks.cc:400] Can't import tensorflow.python.profiler.trace
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Start JAX profiler: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222
+Stop JAX profiler
+
+--------------------[Agent Step 41_536]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.07 / train/loss/dyn 7.05 / train/loss/image 91.71 / train/loss/policy -0.21 / train/loss/rep 7.05 / train/loss/repval 8.74 / train/loss/rew 4.26 / train/loss/value 6.82 / train/rand/action 1 / replay/replay_ratio 29.11 / fps/policy 86.31 / fps/train 2224.79
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 78_848]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 1163 / train/loss/con 0.03 / train/loss/dyn 1 / train/loss/image 2.94 / train/loss/policy -0.31 / train/loss/rep 1 / train/loss/repval 3.73 / train/loss/rew 0.39 / train/loss/value 2.15 / train/rand/action 0.99 / replay/replay_ratio 32.56 / fps/policy 77.73 / fps/train 2491.59
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 113_472]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1014 / train/loss/con 0.02 / train/loss/dyn 1.03 / train/loss/image 2.53 / train/loss/policy -0.28 / train/loss/rep 1.03 / train/loss/repval 3.08 / train/loss/rew 0.14 / train/loss/value 1.73 / train/rand/action 0.84 / replay/replay_ratio 32.44 / fps/policy 97.2 / fps/train 2298.56
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 150_848]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 943 / train/loss/con 0.03 / train/loss/dyn 1.31 / train/loss/image 2.08 / train/loss/policy -0.1 / train/loss/rep 1.31 / train/loss/repval 2.51 / train/loss/rew 0.14 / train/loss/value 1.39 / train/rand/action 0.33 / replay/replay_ratio 32.5 / fps/policy 77.69 / fps/train 2486.06
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 185_408]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 760 / train/loss/con 0.03 / train/loss/dyn 1.02 / train/loss/image 2.17 / train/loss/policy -0.04 / train/loss/rep 1.02 / train/loss/repval 2.09 / train/loss/rew 0.14 / train/loss/value 1.04 / train/rand/action 0.18 / replay/replay_ratio 32.5 / fps/policy 97.33 / fps/train 2303.82
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 222_784]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 855 / train/loss/con 0.03 / train/loss/dyn 1.18 / train/loss/image 2.48 / train/loss/policy -0.08 / train/loss/rep 1.18 / train/loss/repval 1.88 / train/loss/rew 0.14 / train/loss/value 0.95 / train/rand/action 0.76 / replay/replay_ratio 32.5 / fps/policy 77.69 / fps/train 2486.02
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 260_096]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 826 / train/loss/con 0.03 / train/loss/dyn 1.21 / train/loss/image 2.68 / train/loss/policy -0.09 / train/loss/rep 1.21 / train/loss/repval 1.63 / train/loss/rew 0.14 / train/loss/value 1.05 / train/rand/action 0.62 / replay/replay_ratio 32.56 / fps/policy 77.73 / fps/train 2491.62
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250425T232823F705221
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 288_128]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 941 / train/loss/con 0.03 / train/loss/dyn 1 / train/loss/image 2.5 / train/loss/policy -3.4e-3 / train/loss/rep 1 / train/loss/repval 2.02 / train/loss/rew 0.14 / train/loss/value 1.21 / train/rand/action 0.04 / replay/replay_ratio 32.5 / fps/policy 83.61 / fps/train 1867.45
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 325_440]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 822 / train/loss/con 0.03 / train/loss/dyn 1.21 / train/loss/image 2.47 / train/loss/policy -0.04 / train/loss/rep 1.21 / train/loss/repval 1.51 / train/loss/rew 0.14 / train/loss/value 0.83 / train/rand/action 0.47 / replay/replay_ratio 32.44 / fps/policy 77.72 / fps/train 2482.71
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 359_872]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 759 / train/loss/con 0.03 / train/loss/dyn 1.13 / train/loss/image 2.24 / train/loss/policy -2.6e-3 / train/loss/rep 1.13 / train/loss/repval 1.59 / train/loss/rew 0.14 / train/loss/value 1.03 / train/rand/action 0.02 / replay/replay_ratio 32.5 / fps/policy 96.9 / fps/train 2292.42
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 397_184]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 764 / train/loss/con 0.03 / train/loss/dyn 1.12 / train/loss/image 1.95 / train/loss/policy -6.7e-4 / train/loss/rep 1.12 / train/loss/repval 1.87 / train/loss/rew 0.14 / train/loss/value 1.32 / train/rand/action 6.8e-3 / replay/replay_ratio 32.56 / fps/policy 77.73 / fps/train 2491.53
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 434_496]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 763 / train/loss/con 0.03 / train/loss/dyn 1.11 / train/loss/image 1.74 / train/loss/policy -5.1e-4 / train/loss/rep 1.11 / train/loss/repval 1.66 / train/loss/rew 0.14 / train/loss/value 1.13 / train/rand/action 3.7e-3 / replay/replay_ratio 32.44 / fps/policy 77.53 / fps/train 2476.61
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 469_056]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 764 / train/loss/con 0.02 / train/loss/dyn 1.16 / train/loss/image 1.6 / train/loss/policy -9e-3 / train/loss/rep 1.16 / train/loss/repval 1.75 / train/loss/rew 0.14 / train/loss/value 1.44 / train/rand/action 0.26 / replay/replay_ratio 32.5 / fps/policy 97.19 / fps/train 2302.21
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 506_304]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 847 / train/loss/con 0.03 / train/loss/dyn 1.31 / train/loss/image 1.97 / train/loss/policy -3.2e-3 / train/loss/rep 1.31 / train/loss/repval 1.79 / train/loss/rew 0.13 / train/loss/value 1.31 / train/rand/action 0.09 / replay/replay_ratio 32.5 / fps/policy 77.49 / fps/train 2479.81
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250425T234324F013927
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 538_176]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 759 / train/loss/con 0.03 / train/loss/dyn 1.33 / train/loss/image 1.96 / train/loss/policy 0.01 / train/loss/rep 1.33 / train/loss/repval 1.68 / train/loss/rew 0.13 / train/loss/value 1.06 / train/rand/action 0.3 / replay/replay_ratio 32.5 / fps/policy 85.78 / fps/train 1987.69
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 574_272]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 761 / train/loss/con 0.02 / train/loss/dyn 1.31 / train/loss/image 1.67 / train/loss/policy -8.1e-3 / train/loss/rep 1.31 / train/loss/repval 1.38 / train/loss/rew 0.11 / train/loss/value 0.87 / train/rand/action 0.48 / replay/replay_ratio 32.5 / fps/policy 75.2 / fps/train 2406.35
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 611_648]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 960 / train/loss/con 0.03 / train/loss/dyn 1.31 / train/loss/image 1.55 / train/loss/policy 2.7e-3 / train/loss/rep 1.31 / train/loss/repval 1.41 / train/loss/rew 0.09 / train/loss/value 0.88 / train/rand/action 0.42 / replay/replay_ratio 32.5 / fps/policy 77.64 / fps/train 2484.48
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 646_208]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 818 / train/loss/con 0.03 / train/loss/dyn 1.32 / train/loss/image 1.45 / train/loss/policy -1.6e-3 / train/loss/rep 1.32 / train/loss/repval 1.54 / train/loss/rew 0.09 / train/loss/value 0.98 / train/rand/action 0.15 / replay/replay_ratio 32.5 / fps/policy 97.24 / fps/train 2301.76
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 683_264]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 761 / train/loss/con 0.02 / train/loss/dyn 1.84 / train/loss/image 1.22 / train/loss/policy 2.1e-3 / train/loss/rep 1.84 / train/loss/repval 1.39 / train/loss/rew 0.07 / train/loss/value 1.04 / train/rand/action 0.14 / replay/replay_ratio 32.56 / fps/policy 77.16 / fps/train 2473.44
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 717_760]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 762 / train/loss/con 0.02 / train/loss/dyn 1.82 / train/loss/image 0.89 / train/loss/policy 1.5e-4 / train/loss/rep 1.82 / train/loss/repval 1.54 / train/loss/rew 0.04 / train/loss/value 1.27 / train/rand/action 0.1 / replay/replay_ratio 32.44 / fps/policy 97.08 / fps/train 2290.97
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 755_072]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 885 / train/loss/con 0.02 / train/loss/dyn 1.49 / train/loss/image 0.54 / train/loss/policy -1.7e-3 / train/loss/rep 1.49 / train/loss/repval 1.51 / train/loss/rew 0.03 / train/loss/value 1.23 / train/rand/action 0.17 / replay/replay_ratio 32.56 / fps/policy 77.71 / fps/train 2490.87
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 792_320]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 806 / train/loss/con 0.02 / train/loss/dyn 1.53 / train/loss/image 0.64 / train/loss/policy 9.5e-4 / train/loss/rep 1.53 / train/loss/repval 1.35 / train/loss/rew 0.03 / train/loss/value 1.1 / train/rand/action 0.22 / replay/replay_ratio 32.5 / fps/policy 77.6 / fps/train 2483.1
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250425T235824F192451
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 820_544]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 841 / train/loss/con 0.02 / train/loss/dyn 1.54 / train/loss/image 0.62 / train/loss/policy -1.9e-4 / train/loss/rep 1.54 / train/loss/repval 1.47 / train/loss/rew 0.03 / train/loss/value 1.25 / train/rand/action 0.1 / replay/replay_ratio 32.43 / fps/policy 84.74 / fps/train 1875.26
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 857_792]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 813 / train/loss/con 0.02 / train/loss/dyn 1.59 / train/loss/image 0.5 / train/loss/policy -1.1e-4 / train/loss/rep 1.59 / train/loss/repval 1.44 / train/loss/rew 0.03 / train/loss/value 1.2 / train/rand/action 0.15 / replay/replay_ratio 32.5 / fps/policy 77.58 / fps/train 2482.51
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 890_304]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1023 / train/loss/con 0.02 / train/loss/dyn 1.67 / train/loss/image 0.57 / train/loss/policy 7.1e-4 / train/loss/rep 1.67 / train/loss/repval 1.34 / train/loss/rew 0.03 / train/loss/value 1.09 / train/rand/action 0.22 / replay/replay_ratio 32.5 / fps/policy 109.82 / fps/train 2165.25
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 927_680]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1048 / train/loss/con 0.02 / train/loss/dyn 1.75 / train/loss/image 0.62 / train/loss/policy 1.2e-3 / train/loss/rep 1.75 / train/loss/repval 1.46 / train/loss/rew 0.03 / train/loss/value 1.14 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 77.71 / fps/train 2486.58
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 964_928]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 923 / train/loss/con 0.02 / train/loss/dyn 1.47 / train/loss/image 0.52 / train/loss/policy -9e-5 / train/loss/rep 1.47 / train/loss/repval 1.34 / train/loss/rew 0.02 / train/loss/value 1.09 / train/rand/action 0.09 / replay/replay_ratio 32.5 / fps/policy 77.57 / fps/train 2482.26
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 998_464]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 881 / train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.45 / train/loss/policy 3.6e-4 / train/loss/rep 1.34 / train/loss/repval 1.34 / train/loss/rew 0.02 / train/loss/value 1.11 / train/rand/action 0.13 / replay/replay_ratio 32.5 / fps/policy 105.2 / fps/train 2232.97
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_035_712]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1856 / train/loss/con 0.02 / train/loss/dyn 1.3 / train/loss/image 0.47 / train/loss/policy -7.3e-4 / train/loss/rep 1.3 / train/loss/repval 1.29 / train/loss/rew 0.01 / train/loss/value 1.07 / train/rand/action 0.12 / replay/replay_ratio 32.5 / fps/policy 77.54 / fps/train 2481.25
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T001324F241188
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 1_065_024]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 823 / train/loss/con 0.02 / train/loss/dyn 1.39 / train/loss/image 0.45 / train/loss/policy 2.1e-3 / train/loss/rep 1.39 / train/loss/repval 1.33 / train/loss/rew 0.02 / train/loss/value 1.06 / train/rand/action 0.28 / replay/replay_ratio 32.5 / fps/policy 86.23 / fps/train 1903.9
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_101_376]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1044 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.44 / train/loss/policy -2e-3 / train/loss/rep 1.36 / train/loss/repval 1.39 / train/loss/rew 0.01 / train/loss/value 1.09 / train/rand/action 0.19 / replay/replay_ratio 32.5 / fps/policy 75.76 / fps/train 2424.22
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_138_240]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 942 / train/loss/con 0.02 / train/loss/dyn 1.29 / train/loss/image 0.33 / train/loss/policy -2.9e-3 / train/loss/rep 1.29 / train/loss/repval 1.3 / train/loss/rew 0.02 / train/loss/value 1.08 / train/rand/action 0.19 / replay/replay_ratio 32.5 / fps/policy 76.8 / fps/train 2457.49
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 1_172_672]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1122 / train/loss/con 0.02 / train/loss/dyn 1.46 / train/loss/image 0.43 / train/loss/policy -5e-4 / train/loss/rep 1.46 / train/loss/repval 1.33 / train/loss/rew 0.02 / train/loss/value 1.05 / train/rand/action 0.13 / replay/replay_ratio 32.5 / fps/policy 98.87 / fps/train 2290.22
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_209_920]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1156 / train/loss/con 0.02 / train/loss/dyn 1.45 / train/loss/image 0.49 / train/loss/policy 7.1e-4 / train/loss/rep 1.45 / train/loss/repval 1.33 / train/loss/rew 0.02 / train/loss/value 1.08 / train/rand/action 0.14 / replay/replay_ratio 32.5 / fps/policy 77.42 / fps/train 2477.44
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 1_242_624]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1640 / train/loss/con 0.02 / train/loss/dyn 1.42 / train/loss/image 0.45 / train/loss/policy -7.5e-6 / train/loss/rep 1.42 / train/loss/repval 1.31 / train/loss/rew 0.01 / train/loss/value 1.07 / train/rand/action 0.21 / replay/replay_ratio 32.56 / fps/policy 110.06 / fps/train 2183.81
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_279_872]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 939 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.46 / train/loss/policy 5.9e-5 / train/loss/rep 1.36 / train/loss/repval 1.28 / train/loss/rew 0.01 / train/loss/value 1.04 / train/rand/action 0.15 / replay/replay_ratio 32.5 / fps/policy 77.62 / fps/train 2483.99
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_317_184]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 918 / train/loss/con 0.02 / train/loss/dyn 1.47 / train/loss/image 0.48 / train/loss/policy 3.6e-4 / train/loss/rep 1.47 / train/loss/repval 1.42 / train/loss/rew 0.01 / train/loss/value 1.11 / train/rand/action 0.14 / replay/replay_ratio 32.44 / fps/policy 77.63 / fps/train 2479.76
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T002824F447316
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 1_342_272]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1572 / train/loss/con 0.02 / train/loss/dyn 1.47 / train/loss/image 0.49 / train/loss/policy -1.6e-3 / train/loss/rep 1.47 / train/loss/repval 1.53 / train/loss/rew 0.01 / train/loss/value 1.16 / train/rand/action 0.15 / replay/replay_ratio 32.5 / fps/policy 96.77 / fps/train 1669.17
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_379_520]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -18 / episode/length 1332 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.4 / train/loss/policy 4.5e-4 / train/loss/rep 1.4 / train/loss/repval 1.49 / train/loss/rew 0.01 / train/loss/value 1.16 / train/rand/action 0.12 / replay/replay_ratio 32.5 / fps/policy 77.59 / fps/train 2482.72
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 1_413_120]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 1417 / train/loss/con 0.02 / train/loss/dyn 1.35 / train/loss/image 0.45 / train/loss/policy -2.6e-3 / train/loss/rep 1.35 / train/loss/repval 1.31 / train/loss/rew 0.01 / train/loss/value 1.05 / train/rand/action 0.17 / replay/replay_ratio 32.56 / fps/policy 100.29 / fps/train 2243.28
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_450_432]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1066 / train/loss/con 0.02 / train/loss/dyn 1.2 / train/loss/image 0.25 / train/loss/policy -1.4e-3 / train/loss/rep 1.2 / train/loss/repval 1.29 / train/loss/rew 0.02 / train/loss/value 1.07 / train/rand/action 0.18 / replay/replay_ratio 32.44 / fps/policy 77.6 / fps/train 2479.05
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_487_680]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 887 / train/loss/con 0.02 / train/loss/dyn 1.26 / train/loss/image 0.31 / train/loss/policy -2.4e-3 / train/loss/rep 1.26 / train/loss/repval 1.33 / train/loss/rew 0.01 / train/loss/value 1.06 / train/rand/action 0.24 / replay/replay_ratio 32.5 / fps/policy 77.52 / fps/train 2480.62
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 1_522_112]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1069 / train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.36 / train/loss/policy 1.5e-3 / train/loss/rep 1.33 / train/loss/repval 1.39 / train/loss/rew 0.01 / train/loss/value 1.08 / train/rand/action 0.2 / replay/replay_ratio 32.5 / fps/policy 98.87 / fps/train 2292.37
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_559_360]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1468 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.45 / train/loss/policy -2.9e-4 / train/loss/rep 1.4 / train/loss/repval 1.45 / train/loss/rew 0.01 / train/loss/value 1.11 / train/rand/action 0.18 / replay/replay_ratio 32.5 / fps/policy 77.56 / fps/train 2481.98
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T004324F454313
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 1_587_456]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 940 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.47 / train/loss/policy 7.5e-5 / train/loss/rep 1.4 / train/loss/repval 1.51 / train/loss/rew 0.01 / train/loss/value 1.14 / train/rand/action 0.13 / replay/replay_ratio 32.57 / fps/policy 88.36 / fps/train 1845.85
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_623_872]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1793 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.46 / train/loss/policy -8.8e-4 / train/loss/rep 1.36 / train/loss/repval 1.6 / train/loss/rew 0.01 / train/loss/value 1.2 / train/rand/action 0.11 / replay/replay_ratio 32.44 / fps/policy 75.82 / fps/train 2422.11
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_661_184]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1400 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.52 / train/loss/policy 5.6e-4 / train/loss/rep 1.4 / train/loss/repval 1.59 / train/loss/rew 9.8e-3 / train/loss/value 1.17 / train/rand/action 0.07 / replay/replay_ratio 32.56 / fps/policy 77.71 / fps/train 2490.87
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 1_691_904]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 1728 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.48 / train/loss/policy -1.3e-3 / train/loss/rep 1.43 / train/loss/repval 1.49 / train/loss/rew 8.7e-3 / train/loss/value 1.12 / train/rand/action 0.08 / replay/replay_ratio 32.5 / fps/policy 127.13 / fps/train 2047.92
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 1_728_640]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -18 / episode/length 2138 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.4 / train/loss/policy 1.8e-4 / train/loss/rep 1.36 / train/loss/repval 1.41 / train/loss/rew 8.5e-3 / train/loss/value 1.09 / train/rand/action 0.11 / replay/replay_ratio 32.5 / fps/policy 76.53 / fps/train 2449.01
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 1_759_680]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 1740 / train/loss/con 0.02 / train/loss/dyn 1.35 / train/loss/image 0.37 / train/loss/policy 7e-4 / train/loss/rep 1.35 / train/loss/repval 1.44 / train/loss/rew 7.2e-3 / train/loss/value 1.1 / train/rand/action 0.11 / replay/replay_ratio 32.43 / fps/policy 122.56 / fps/train 2063.25
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_797_056]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 2668 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.37 / train/loss/policy 1.5e-4 / train/loss/rep 1.36 / train/loss/repval 1.54 / train/loss/rew 7.4e-3 / train/loss/value 1.15 / train/rand/action 0.09 / replay/replay_ratio 32.5 / fps/policy 77.66 / fps/train 2485.27
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_834_368]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -17 / episode/length 2846 / train/loss/con 0.02 / train/loss/dyn 1.44 / train/loss/image 0.39 / train/loss/policy -8.5e-5 / train/loss/rep 1.44 / train/loss/repval 1.54 / train/loss/rew 8.6e-3 / train/loss/value 1.15 / train/rand/action 0.08 / replay/replay_ratio 32.56 / fps/policy 77.68 / fps/train 2490.07
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T005824F584529
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 1_852_352]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 2347 / train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.37 / train/loss/policy -1.7e-4 / train/loss/rep 1.34 / train/loss/repval 1.48 / train/loss/rew 6.8e-3 / train/loss/value 1.08 / train/rand/action 0.07 / replay/replay_ratio 32.38 / fps/policy 115.67 / fps/train 1194.35
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_889_664]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 2468 / train/loss/con 0.02 / train/loss/dyn 1.42 / train/loss/image 0.41 / train/loss/policy 3e-4 / train/loss/rep 1.42 / train/loss/repval 1.68 / train/loss/rew 7.5e-3 / train/loss/value 1.23 / train/rand/action 0.06 / replay/replay_ratio 32.56 / fps/policy 77.68 / fps/train 2489.9
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 1_918_784]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 2286 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.4 / train/loss/policy -4.3e-4 / train/loss/rep 1.43 / train/loss/repval 1.64 / train/loss/rew 7.5e-3 / train/loss/value 1.18 / train/rand/action 0.08 / replay/replay_ratio 32.43 / fps/policy 136.5 / fps/train 1931.93
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_956_096]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 3164 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.41 / train/loss/policy -1.3e-3 / train/loss/rep 1.43 / train/loss/repval 1.76 / train/loss/rew 7.1e-3 / train/loss/value 1.25 / train/rand/action 0.07 / replay/replay_ratio 32.56 / fps/policy 77.7 / fps/train 2490.77
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 1_993_280]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 1797 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.36 / train/loss/policy 2.5e-5 / train/loss/rep 1.4 / train/loss/repval 1.96 / train/loss/rew 8.6e-3 / train/loss/value 1.38 / train/rand/action 0.06 / replay/replay_ratio 32.44 / fps/policy 77.45 / fps/train 2474.08
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 2_019_008]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 3108 / train/loss/con 0.02 / train/loss/dyn 1.51 / train/loss/image 0.29 / train/loss/policy -2.2e-4 / train/loss/rep 1.51 / train/loss/repval 1.6 / train/loss/rew 6.3e-3 / train/loss/value 1.17 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 161.34 / fps/train 1712.83
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_056_256]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 2472 / train/loss/con 0.02 / train/loss/dyn 1.84 / train/loss/image 0.35 / train/loss/policy 3.8e-4 / train/loss/rep 1.84 / train/loss/repval 1.42 / train/loss/rew 5.6e-3 / train/loss/value 1.07 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 77.54 / fps/train 2481.23
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T011324F609038
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 2_082_880]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 1916 / train/loss/con 0.02 / train/loss/dyn 1.94 / train/loss/image 0.44 / train/loss/policy 2.1e-3 / train/loss/rep 1.94 / train/loss/repval 1.71 / train/loss/rew 7.9e-3 / train/loss/value 1.17 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 94.15 / fps/train 1400.36
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_120_128]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 3439 / train/loss/con 0.02 / train/loss/dyn 1.7 / train/loss/image 0.32 / train/loss/policy -6.6e-4 / train/loss/rep 1.7 / train/loss/repval 1.6 / train/loss/rew 7.1e-3 / train/loss/value 1.17 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 77.53 / fps/train 2481.06
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 2_157_120]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 2772 / train/loss/con 0.02 / train/loss/dyn 1.55 / train/loss/image 0.27 / train/loss/policy 1.1e-3 / train/loss/rep 1.55 / train/loss/repval 1.61 / train/loss/rew 4.2e-3 / train/loss/value 1.19 / train/rand/action 0.06 / replay/replay_ratio 32.5 / fps/policy 134.46 / fps/train 1956.77
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_194_368]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -13 / episode/length 3283 / train/loss/con 0.02 / train/loss/dyn 1.48 / train/loss/image 0.25 / train/loss/policy 2e-4 / train/loss/rep 1.48 / train/loss/repval 1.64 / train/loss/rew 4.8e-3 / train/loss/value 1.2 / train/rand/action 0.02 / replay/replay_ratio 32.5 / fps/policy 77.55 / fps/train 2481.6
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_231_616]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 3018 / train/loss/con 0.02 / train/loss/dyn 1.49 / train/loss/image 0.24 / train/loss/policy 5.4e-4 / train/loss/rep 1.49 / train/loss/repval 1.75 / train/loss/rew 5.1e-3 / train/loss/value 1.24 / train/rand/action 0.03 / replay/replay_ratio 32.5 / fps/policy 77.55 / fps/train 2481.66
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 2_264_000]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -17 / episode/length 4539 / train/loss/con 0.02 / train/loss/dyn 1.56 / train/loss/image 0.25 / train/loss/policy 5.9e-4 / train/loss/rep 1.56 / train/loss/repval 1.79 / train/loss/rew 5.9e-3 / train/loss/value 1.25 / train/rand/action 0.02 / replay/replay_ratio 32.5 / fps/policy 113.02 / fps/train 2158.66
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_301_120]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 4345 / train/loss/con 0.02 / train/loss/dyn 1.45 / train/loss/image 0.25 / train/loss/policy 1.1e-3 / train/loss/rep 1.45 / train/loss/repval 1.97 / train/loss/rew 6e-3 / train/loss/value 1.36 / train/rand/action 0.03 / replay/replay_ratio 32.5 / fps/policy 77.31 / fps/train 2473.82
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T012824F915806
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 2_327_168]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 6312 / train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.2 / train/loss/policy 1.3e-3 / train/loss/rep 1.38 / train/loss/repval 1.43 / train/loss/rew 3.1e-3 / train/loss/value 1.07 / train/rand/action 0.07 / replay/replay_ratio 32.58 / fps/policy 163.27 / fps/train 1073.9
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_364_480]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -17 / episode/length 4667 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.2 / train/loss/policy -2.2e-4 / train/loss/rep 1.4 / train/loss/repval 1.77 / train/loss/rew 4.9e-3 / train/loss/value 1.27 / train/rand/action 0.04 / replay/replay_ratio 32.44 / fps/policy 77.63 / fps/train 2479.91
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 2_387_264]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -17 / episode/length 5872 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.25 / train/loss/policy 1.5e-3 / train/loss/rep 1.4 / train/loss/repval 1.66 / train/loss/rew 4.2e-3 / train/loss/value 1.19 / train/rand/action 0.07 / replay/replay_ratio 32.5 / fps/policy 209.1 / fps/train 1305.96
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_424_640]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 4864 / train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.24 / train/loss/policy 6.4e-5 / train/loss/rep 1.38 / train/loss/repval 2 / train/loss/rew 5.1e-3 / train/loss/value 1.41 / train/rand/action 0.07 / replay/replay_ratio 32.5 / fps/policy 77.69 / fps/train 2486.07
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 2_459_904]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -19 / episode/length 5189 / train/loss/con 0.02 / train/loss/dyn 1.45 / train/loss/image 0.22 / train/loss/policy 1e-3 / train/loss/rep 1.45 / train/loss/repval 1.77 / train/loss/rew 4e-3 / train/loss/value 1.26 / train/rand/action 0.07 / replay/replay_ratio 32.56 / fps/policy 167.5 / fps/train 1600.87
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_497_216]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 5734 / train/loss/con 0.02 / train/loss/dyn 1.47 / train/loss/image 0.23 / train/loss/policy 2.1e-4 / train/loss/rep 1.47 / train/loss/repval 1.69 / train/loss/rew 6.4e-3 / train/loss/value 1.17 / train/rand/action 0.06 / replay/replay_ratio 32.44 / fps/policy 77.64 / fps/train 2480.09
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T014324F956167
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 2_532_480]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -5 / episode/length 9885 / train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.22 / train/loss/policy 6.3e-4 / train/loss/rep 1.38 / train/loss/repval 1.58 / train/loss/rew 4.1e-3 / train/loss/value 1.12 / train/rand/action 0.07 / replay/replay_ratio 32.56 / fps/policy 169.65 / fps/train 991.56
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 2_569_792]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.41 / train/loss/image 0.22 / train/loss/policy -6.3e-4 / train/loss/rep 1.41 / train/loss/repval 2.06 / train/loss/rew 3.8e-3 / train/loss/value 1.51 / train/rand/action 0.07 / replay/replay_ratio 32.44 / fps/policy 77.66 / fps/train 2480.7
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 2_592_448]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -16 / episode/length 4139 / train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.23 / train/loss/policy -8.7e-5 / train/loss/rep 1.33 / train/loss/repval 1.67 / train/loss/rew 3.9e-3 / train/loss/value 1.24 / train/rand/action 0.11 / replay/replay_ratio 32.5 / fps/policy 185.13 / fps/train 1510.13
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_629_696]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 4795 / train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.28 / train/loss/policy 1.2e-3 / train/loss/rep 1.38 / train/loss/repval 1.72 / train/loss/rew 3.6e-3 / train/loss/value 1.26 / train/rand/action 0.09 / replay/replay_ratio 32.5 / fps/policy 77.52 / fps/train 2480.64
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 2_659_520]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -13 / episode/length 6199 / train/loss/con 0.02 / train/loss/dyn 1.42 / train/loss/image 0.3 / train/loss/policy 2.8e-3 / train/loss/rep 1.42 / train/loss/repval 1.88 / train/loss/rew 3.3e-3 / train/loss/value 1.36 / train/rand/action 0.12 / replay/replay_ratio 32.5 / fps/policy 132.29 / fps/train 1985.56
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_696_768]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -16 / episode/length 5241 / train/loss/con 0.02 / train/loss/dyn 1.42 / train/loss/image 0.28 / train/loss/policy -3.6e-4 / train/loss/rep 1.42 / train/loss/repval 1.93 / train/loss/rew 4.7e-3 / train/loss/value 1.42 / train/rand/action 0.1 / replay/replay_ratio 32.5 / fps/policy 77.39 / fps/train 2476.37
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 2_733_824]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -10 / episode/length 5635 / train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.22 / train/loss/policy 2.4e-3 / train/loss/rep 1.38 / train/loss/repval 1.76 / train/loss/rew 5.1e-3 / train/loss/value 1.27 / train/rand/action 0.15 / replay/replay_ratio 32.56 / fps/policy 77.21 / fps/train 2474.87
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T015824F984946
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 2_736_320]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -12 / episode/length 9698 / train/loss/con 0.02 / train/loss/dyn 1.44 / train/loss/image 0.18 / train/loss/policy -2.2e-4 / train/loss/rep 1.44 / train/loss/repval 1.69 / train/loss/rew 3e-3 / train/loss/value 1.25 / train/rand/action 0.16 / replay/replay_ratio 31.67 / fps/policy 226.65 / fps/train 111.88
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_773_440]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.19 / train/loss/policy 2.1e-3 / train/loss/rep 1.36 / train/loss/repval 1.7 / train/loss/rew 3.2e-3 / train/loss/value 1.21 / train/rand/action 0.1 / replay/replay_ratio 32.5 / fps/policy 77.19 / fps/train 2470.22
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 2_794_624]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -11 / episode/length 4533 / train/loss/con 0.02 / train/loss/dyn 1.42 / train/loss/image 0.23 / train/loss/policy 1.5e-4 / train/loss/rep 1.42 / train/loss/repval 1.74 / train/loss/rew 3.1e-3 / train/loss/value 1.27 / train/rand/action 0.12 / replay/replay_ratio 32.6 / fps/policy 195.22 / fps/train 1416.4
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 2_831_808]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -16 / episode/length 5178 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.28 / train/loss/policy 1e-3 / train/loss/rep 1.43 / train/loss/repval 2.04 / train/loss/rew 5.5e-3 / train/loss/value 1.48 / train/rand/action 0.11 / replay/replay_ratio 32.44 / fps/policy 77.32 / fps/train 2469.92
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 2_855_808]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score 10 / episode/length 8576 / train/loss/con 0.02 / train/loss/dyn 1.37 / train/loss/image 0.24 / train/loss/policy 4e-3 / train/loss/rep 1.37 / train/loss/repval 1.72 / train/loss/rew 2.9e-3 / train/loss/value 1.27 / train/rand/action 0.16 / replay/replay_ratio 32.59 / fps/policy 229.26 / fps/train 1095.05
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_891_968]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -13 / episode/length 6320 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.2 / train/loss/policy -7.1e-4 / train/loss/rep 1.43 / train/loss/repval 1.94 / train/loss/rew 4e-3 / train/loss/value 1.33 / train/rand/action 0.06 / replay/replay_ratio 32.44 / fps/policy 75.32 / fps/train 2406
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T021324F985529
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 2_916_224]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 2109 / train/loss/con 0.02 / train/loss/dyn 1.44 / train/loss/image 0.24 / train/loss/policy -2.6e-3 / train/loss/rep 1.44 / train/loss/repval 2.19 / train/loss/rew 5.9e-3 / train/loss/value 1.57 / train/rand/action 0.07 / replay/replay_ratio 32.59 / fps/policy 93.36 / fps/train 1252.65
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 2_952_896]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -10 / episode/length 6250 / train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.22 / train/loss/policy 4.8e-4 / train/loss/rep 1.33 / train/loss/repval 1.78 / train/loss/rew 2.8e-3 / train/loss/value 1.28 / train/rand/action 0.07 / replay/replay_ratio 32.44 / fps/policy 76.38 / fps/train 2439.95
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 2_987_456]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 758 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.22 / train/loss/policy -7.9e-5 / train/loss/rep 1.36 / train/loss/repval 1.87 / train/loss/rew 3.1e-3 / train/loss/value 1.33 / train/rand/action 0.05 / replay/replay_ratio 32.5 / fps/policy 97.15 / fps/train 2301.32
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_024_704]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -13 / episode/length 5347 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.2 / train/loss/policy 2.5e-4 / train/loss/rep 1.4 / train/loss/repval 1.9 / train/loss/rew 3.9e-3 / train/loss/value 1.31 / train/rand/action 0.03 / replay/replay_ratio 32.5 / fps/policy 77.4 / fps/train 2476.7
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_061_760]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -9 / episode/length 6269 / train/loss/con 0.02 / train/loss/dyn 1.39 / train/loss/image 0.2 / train/loss/policy 1.4e-3 / train/loss/rep 1.39 / train/loss/repval 1.58 / train/loss/rew 3.1e-3 / train/loss/value 1.07 / train/rand/action 0.07 / replay/replay_ratio 32.56 / fps/policy 77.16 / fps/train 2473.33
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 3_076_096]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -17 / episode/length 7091 / train/loss/con 0.02 / train/loss/dyn 1.37 / train/loss/image 0.2 / train/loss/policy 8.8e-5 / train/loss/rep 1.37 / train/loss/repval 1.69 / train/loss/rew 2.7e-3 / train/loss/value 1.17 / train/rand/action 0.04 / replay/replay_ratio 32.5 / fps/policy 248.03 / fps/train 890.4
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_113_280]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.41 / train/loss/image 0.21 / train/loss/policy 4.7e-4 / train/loss/rep 1.41 / train/loss/repval 2.03 / train/loss/rew 4.6e-3 / train/loss/value 1.43 / train/rand/action 0.09 / replay/replay_ratio 32.44 / fps/policy 77.32 / fps/train 2469.92
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T022825F275120
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 3_142_400]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -21 / episode/length 942 / train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.2 / train/loss/policy 1.7e-3 / train/loss/rep 1.34 / train/loss/repval 1.71 / train/loss/rew 2.6e-3 / train/loss/value 1.21 / train/rand/action 0.11 / replay/replay_ratio 32.57 / fps/policy 81.5 / fps/train 1722.29
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_178_432]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.38 / train/loss/image 0.21 / train/loss/policy 2.5e-3 / train/loss/rep 1.38 / train/loss/repval 1.91 / train/loss/rew 4e-3 / train/loss/value 1.39 / train/rand/action 0.11 / replay/replay_ratio 32.44 / fps/policy 75.07 / fps/train 2397.93
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 3_215_680]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -6 / episode/length 7481 / train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.27 / train/loss/policy 4.5e-3 / train/loss/rep 1.34 / train/loss/repval 2.08 / train/loss/rew 3.7e-3 / train/loss/value 1.47 / train/rand/action 0.09 / replay/replay_ratio 32.5 / fps/policy 77.42 / fps/train 2477.58
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 3_222_400]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score 1 / episode/length 9676 / train/loss/con 0.02 / train/loss/dyn 1.37 / train/loss/image 0.31 / train/loss/policy 4.2e-3 / train/loss/rep 1.37 / train/loss/repval 2.18 / train/loss/rew 3.6e-3 / train/loss/value 1.61 / train/rand/action 0.08 / replay/replay_ratio 32.81 / fps/policy 307.51 / fps/train 413.27
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 3_259_712]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 5946 / train/loss/con 0.02 / train/loss/dyn 1.43 / train/loss/image 0.26 / train/loss/policy 3.1e-5 / train/loss/rep 1.43 / train/loss/repval 2.14 / train/loss/rew 4.2e-3 / train/loss/value 1.48 / train/rand/action 0.08 / replay/replay_ratio 32.44 / fps/policy 77.61 / fps/train 2479.24
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 3_281_536]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -16 / episode/length 4986 / train/loss/con 0.02 / train/loss/dyn 1.46 / train/loss/image 0.23 / train/loss/policy -3.6e-4 / train/loss/rep 1.46 / train/loss/repval 1.81 / train/loss/rew 4.2e-3 / train/loss/value 1.25 / train/rand/action 0.09 / replay/replay_ratio 32.6 / fps/policy 199.48 / fps/train 1375.19
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_318_848]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -15 / episode/length 6060 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.24 / train/loss/policy 1.9e-3 / train/loss/rep 1.4 / train/loss/repval 1.88 / train/loss/rew 4.1e-3 / train/loss/value 1.39 / train/rand/action 0.09 / replay/replay_ratio 32.44 / fps/policy 77.62 / fps/train 2479.72
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T024325F453611
+Saved checkpoint.
+
+--------------------[Agent Step 3_355_072]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -6 / episode/length 8281 / train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.19 / train/loss/policy 4.4e-4 / train/loss/rep 1.33 / train/loss/repval 1.71 / train/loss/rew 3e-3 / train/loss/value 1.21 / train/rand/action 0.08 / replay/replay_ratio 32.5 / fps/policy 75.21 / fps/train 2406.8
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 3_358_528]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -13 / episode/length 4556 / train/loss/con 0.02 / train/loss/dyn 1.36 / train/loss/image 0.22 / train/loss/policy 5.3e-3 / train/loss/rep 1.36 / train/loss/repval 2.1 / train/loss/rew 3.4e-3 / train/loss/value 1.49 / train/rand/action 0.13 / replay/replay_ratio 32.5 / fps/policy 159.02 / fps/train 230.34
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_394_624]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -14 / episode/length 5985 / train/loss/con 0.02 / train/loss/dyn 1.35 / train/loss/image 0.19 / train/loss/policy 4e-3 / train/loss/rep 1.35 / train/loss/repval 1.71 / train/loss/rew 3.3e-3 / train/loss/value 1.16 / train/rand/action 0.13 / replay/replay_ratio 32.5 / fps/policy 75.11 / fps/train 2403.58
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 3_426_368]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1530 / train/loss/con 0.02 / train/loss/dyn 1.3 / train/loss/image 0.18 / train/loss/policy 3.5e-3 / train/loss/rep 1.3 / train/loss/repval 1.91 / train/loss/rew 3.7e-3 / train/loss/value 1.36 / train/rand/action 0.14 / replay/replay_ratio 32.5 / fps/policy 116.83 / fps/train 2110.86
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 3_463_616]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -9 / episode/length 6396 / train/loss/con 0.02 / train/loss/dyn 1.35 / train/loss/image 0.2 / train/loss/policy 3.2e-3 / train/loss/rep 1.35 / train/loss/repval 1.9 / train/loss/rew 3.5e-3 / train/loss/value 1.33 / train/rand/action 0.12 / replay/replay_ratio 32.5 / fps/policy 77.42 / fps/train 2477.44
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_500_800]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.18 / train/loss/policy 2.5e-3 / train/loss/rep 1.33 / train/loss/repval 1.58 / train/loss/rew 2.2e-3 / train/loss/value 1.09 / train/rand/action 0.15 / replay/replay_ratio 32.56 / fps/policy 77.42 / fps/train 2481.71
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 3_501_440]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score 14 / episode/length 1.1e4 / train/loss/con 0.02 / train/loss/dyn 1.24 / train/loss/image 0.25 / train/loss/policy 2.2e-3 / train/loss/rep 1.24 / train/loss/repval 1.62 / train/loss/rew 3.1e-3 / train/loss/value 1.36 / train/rand/action 0.14 / replay/replay_ratio 32.5 / fps/policy 345.69 / fps/train 41.92
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 3_538_752]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.18 / train/loss/policy 8.2e-4 / train/loss/rep 1.34 / train/loss/repval 1.67 / train/loss/rew 2.3e-3 / train/loss/value 1.21 / train/rand/action 0.16 / replay/replay_ratio 32.44 / fps/policy 77.6 / fps/train 2478.89
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Saving checkpoint: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/ckpt/20250426T025825F658754
+Saved checkpoint.
+Evaluation
+
+--------------------[Agent Step 3_556_224]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score 10 / episode/length 1.3e4 / train/loss/con 0.02 / train/loss/dyn 1.4 / train/loss/image 0.19 / train/loss/policy 3.9e-5 / train/loss/rep 1.4 / train/loss/repval 1.78 / train/loss/rew 2.9e-3 / train/loss/value 1.32 / train/rand/action 0.14 / replay/replay_ratio 32.62 / fps/policy 214.62 / fps/train 541.34
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Evaluation
+
+--------------------[Agent Step 3_589_312]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -20 / episode/length 1159 / train/loss/con 0.02 / train/loss/dyn 1.33 / train/loss/image 0.19 / train/loss/policy 2e-3 / train/loss/rep 1.33 / train/loss/repval 1.71 / train/loss/rew 2.4e-3 / train/loss/value 1.28 / train/rand/action 0.14 / replay/replay_ratio 32.44 / fps/policy 107.32 / fps/train 2196.48
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+
+--------------------[Agent Step 3_626_560]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.28 / train/loss/image 0.16 / train/loss/policy 3.7e-4 / train/loss/rep 1.28 / train/loss/repval 1.73 / train/loss/rew 2.1e-3 / train/loss/value 1.33 / train/rand/action 0.15 / replay/replay_ratio 32.5 / fps/policy 77.44 / fps/train 2478.14
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_663_808]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.35 / train/loss/image 0.18 / train/loss/policy 1.4e-3 / train/loss/rep 1.35 / train/loss/repval 1.64 / train/loss/rew 2.9e-3 / train/loss/value 1.23 / train/rand/action 0.16 / replay/replay_ratio 32.5 / fps/policy 77.42 / fps/train 2477.54
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+Evaluation
+
+--------------------[Agent Step 3_682_112]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+episode/score -10 / episode/length 5363 / train/loss/con 0.02 / train/loss/dyn 1.34 / train/loss/image 0.18 / train/loss/policy 2.6e-3 / train/loss/rep 1.34 / train/loss/repval 1.78 / train/loss/rew 2.9e-3 / train/loss/value 1.38 / train/rand/action 0.17 / replay/replay_ratio 32.5 / fps/policy 216.8 / fps/train 1219.72
+
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/metrics.jsonl
+Writing metrics: /home/scur2582/dreamerv3/logdir/dreamer/20250425T231222/scores.jsonl
+
+--------------------[Agent Step 3_719_424]--------------------
+Metrics filtered by: 'score|length|fps|ratio|train/loss/|train/rand/'
+train/loss/con 0.02 / train/loss/dyn 1.28 / train/loss/image 0.21 / train/loss/policy 5.1e-3 / train/loss/rep 1.28 / train/loss/repval 1.82 / train/loss/rew 3e-3 / train/loss/value 1.34 / train/rand/action 0.16 / replay/replay_ratio 32.56 / fps/policy 77.75 / fps/train 2492.13
+
+slurmstepd: error: *** JOB 11391755 ON gcn35 CANCELLED AT 2025-04-26T03:12:33 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 11391755.0 ON gcn35 CANCELLED AT 2025-04-26T03:12:33 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+
+JOB STATISTICS
+==============
+Job ID: 11391755
+Cluster: snellius
+User/Group: scur2582/scur2582
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 18
+CPU Utilized: 04:13:11
+CPU Efficiency: 5.85% of 3-00:07:12 core-walltime
+Job Wall-clock time: 04:00:24
+Memory Utilized: 18.88 GB
+Memory Efficiency: 15.73% of 120.00 GB (120.00 GB/node)

@@ -215,7 +215,7 @@ def make_replay(config, folder, mode='train'):
     # print("--------------------------------------------------------")
 
   # Mixture
-  elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.recency != 0 and mode == 'train':
+  elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
