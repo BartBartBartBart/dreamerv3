@@ -219,7 +219,6 @@ def make_replay(config, folder, mode='train'):
         recency=selectors.Recency(recency),
     ), config.replay.fracs)
 
-  # print(kwargs)
   return embodied.replay.Replay(**kwargs)
 
 

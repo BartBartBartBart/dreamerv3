@@ -71,7 +71,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
   carry_train = [agent.init_train(args.batch_size)]
   carry_report = agent.init_report(args.batch_size)
 
-  def trainfn(tran, worker, policy):
+  def trainfn(tran, worker):
     if len(replay) < args.batch_size * args.batch_length:
       return
     for _ in range(should_train(step)):
@@ -81,45 +81,47 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
       train_fps.step(batch_steps)
       if 'replay' in outs:
-        continue
         replay.update(outs['replay'])
-
+        continue
         print("--------------------------------------")
         # print(carry_train[0][1].__dict__.keys())
         # print(outs["replay"].keys())
         world_model = agent.model.dyn
 
-        deter = jnp.asarray(outs["replay"]["dyn/deter"], dtype=jnp.float32)
-        stoch = jnp.asarray(outs["replay"]["dyn/stoch"], dtype=jnp.float32)
+        deter = jnp.asarray(outs["replay"]["dyn/deter"][0], dtype=jnp.float32)
+        stoch = jnp.asarray(outs["replay"]["dyn/stoch"][0], dtype=jnp.float32)
+        print(f"length deter: {len(deter)}")
+        print(f"length stoch: {len(stoch)}")
 
         carry = ({
-            "deter": deter,
-            "stoch": stoch,
+            "deter": deter, # The latent state h
+            "stoch": stoch, # The discrete state z
         })
         
-        # prevact = outs["replay"]["prevact"]
-
         sample = lambda xs: jax.tree.map(lambda x: x.sample(nj.seed()), xs)
 
-        # policyfn = nj.pure(lambda feat: sample(agent.model.pol(agent.model.feat2tensor(feat), 1)))
-        def wrapped_policyfn(feat):
-          return sample(agent.model.pol(agent.model.feat2tensor(feat), 1))
-        policyfn = nj.pure(wrapped_policyfn)
+        # policy = nj.pure(lambda feat: sample(world_model.pol(world_model.feat2tensor(feat), 1)))
+        policy = lambda feat: sample(agent.model.pol(agent.model.feat2tensor(feat), 1))
 
-        carry, feat, act = world_model.imagine(
-            carry=carry,
-            policy=policyfn,
-            length=1,
-            training=True,
-            single=True,
-        )
 
-        print(f"Carry: {carry}")
-        print(f"Feat: {feat}")
-        print(f"Act: {act}")
+        sg = jax.lax.stop_gradient
+        import embodied.jax.nets as nn
+
+        if callable(policy):
+          print("Policy is callable")
+          action = policy(sg(carry)) 
+        else:
+          print("Policy is not callable")
+          policy
+        actemb = nn.DictConcat(world_model.act_space, 1)(action)
+        deter = world_model._core(carry['deter'], carry['stoch'], actemb)
+
+        print(f"deter: {deter}")
+
         print("-------------------------------")
 
       train_agg.add(mets, prefix='train')
+  driver.on_step(trainfn)
 
   cp = elements.Checkpoint(logdir / 'ckpt')
   cp.step = step
@@ -132,7 +134,7 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
   print('Start training loop')
   policy = lambda *args: agent.policy(*args, mode='train')
-  driver.on_step(partial(trainfn, policy=policy))
+  # driver.on_step(partial(trainfn, policy=policy))
   driver.reset(agent.init_policy)
   while step < args.steps:
 
