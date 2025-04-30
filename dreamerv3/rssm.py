@@ -120,8 +120,8 @@ class RSSM(nj.Module):
   def loss(self, carry, tokens, acts, reset, training):
     metrics = {}
     carry, entries, feat = self.observe(carry, tokens, acts, reset, training)
-    prior = self._prior(feat['deter'])
-    post = feat['logit']
+    prior = self._prior(feat['deter']) # p(z_t | h_t)
+    post = feat['logit'] # q(z-t | o_t, h_t)
     dyn = self._dist(sg(post)).kl(self._dist(prior))
     rep = self._dist(post).kl(self._dist(sg(prior)))
     if self.free_nats:

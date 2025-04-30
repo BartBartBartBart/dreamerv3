@@ -136,7 +136,7 @@ class Replay:
     priority = data.pop('priority', None)
     assert stepid.ndim == 3, stepid.shape
     self.metrics['updates'] += int(np.prod(stepid.shape[:-1]))
-    # print("PRIORITY:", priority)
+    print("PRIORITY:", priority)
     if priority is not None:
       assert priority.ndim == 2, priority.shape
       self.sampler.prioritize(

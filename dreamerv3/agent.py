@@ -151,7 +151,7 @@ class Agent(embodied.jax.Agent):
       outs['replay'] = updates
     
     if "replay" in outs:
-      self.calc_uncertainty(outs)
+      outs = self.calc_uncertainty(outs)
 
     # if self.config.replay.fracs.priority > 0:
     #   outs['replay']['priority'] = losses['model']
@@ -164,53 +164,55 @@ class Agent(embodied.jax.Agent):
   def calc_uncertainty(self, outs):
     print("--------------------------------------")
     world_model = self.dyn
-
-    deter = outs["replay"]["dyn/deter"]
+    deter = outs["replay"]["dyn/deter"] # To be added to the replay buffer
     stoch = outs["replay"]["dyn/stoch"]
+    batch_stochs = []
+    batch_deters = []
 
-    print(f"shape deter: {deter.shape}")
-    print(f"shape stoch: {stoch.shape}")
+    # For each sequence in the batch
+    for seq in range(deter.shape[0]): 
+      mean_stoch_kl = 0
+      mean_deter_kl = 0
+      
+      # For each time step in the sequence
+      for t in range(deter.shape[1]-1): 
+        carry = ({
+            "deter": jnp.expand_dims(deter[seq,t],0), # The latent state h
+            "stoch": jnp.expand_dims(stoch[seq,t],0), # The discrete state z
+        })
+        actual_next_stoch = jnp.expand_dims(stoch[seq,t+1],0)
+        actual_next_deter = jnp.expand_dims(deter[seq,t+1],0)
+        
+        policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
 
-    # Take the first time step of the first sequence in the batch
-    carry = ({
-        "deter": jnp.expand_dims(deter[0,0],0), # The latent state h
-        "stoch": jnp.expand_dims(stoch[0,0],0), # The discrete state z
-    })
+        # Calculate next state
+        action = policy(sg(carry)) if callable(policy) else policy
+        actemb = nn.DictConcat(world_model.act_space, 1)(action)
+        next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
+        next_logit = world_model._prior(next_deter)
+        next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
+        # next_carry = nn.cast(dict(deter=next_deter, stoch=next_stoch))
+        # next_feat = nn.cast(dict(deter=next_deter, stoch=next_stoch, logit=next_logit))
 
-    print(f"shape carry: {carry['deter'].shape}")
-    print(f"shape carry: {carry['stoch'].shape}")
-    
-    policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
+        # Calculate uncertainty with KL divergence
+        mean_stoch_kl += world_model._dist(next_stoch).kl(world_model._dist(actual_next_stoch))[0]
+        mean_deter_kl += world_model._dist(next_deter).kl(world_model._dist(actual_next_deter)) # unnecessary?
+        
+      mean_stoch_kl /= (deter.shape[1]-1)
+      mean_deter_kl /= (deter.shape[1]-1)
+      batch_stochs.append(mean_stoch_kl)
+      batch_deters.append(mean_deter_kl)
 
-    # Calculate next state
-    action = policy(sg(carry)) if callable(policy) else policy
-    actemb = nn.DictConcat(world_model.act_space, 1)(action)
-    next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
-    next_logit = world_model._prior(next_deter)
-    next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
-    next_carry = nn.cast(dict(deter=next_deter, stoch=next_stoch))
-    next_feat = nn.cast(dict(deter=next_deter, stoch=next_stoch, logit=next_logit))
-
-    print(f"shape next_deter: {next_deter.shape}")
-    print(f"shape next_stoch: {next_stoch.shape}")
-
-    # Calculate uncertainty with KL divergence
-    kl_stoch = world_model._dist(next_stoch).kl(world_model._dist(carry['stoch']))
-    kl_deter = world_model._dist(next_deter).kl(world_model._dist(carry['deter']))
-
-    # prior = self._prior(feat['deter'])
-    # post = feat['logit']
-    # dyn = self._dist(sg(post)).kl(self._dist(prior))
-    # rep = self._dist(post).kl(self._dist(sg(prior)))
-
-    # print the uncertainty with jax.debug.print
+    batch_stochs = jnp.array(batch_stochs)
+    batch_deters = jnp.array(batch_deters)
     jax.debug.print(
-        "KL divergence between stoch and deter repr.: {kl_stoch} {kl_deter}",
-        kl_stoch=kl_stoch,
-        kl_deter=kl_deter,
-    )
+        "Batch stoch KL: {batch_stochs}, Batch deter KL: {batch_deters}",
+        batch_stochs=batch_stochs, batch_deters=batch_deters)
+    outs["replay"]["uncertainty/stochs"] = batch_stochs # (B)
+    outs["replay"]["uncertainty/deter"] = batch_deters # (B)
+    print("--------------------------------------")
 
-    print("-------------------------------")
+    return outs
 
   def loss(self, carry, obs, prevact, training):
     enc_carry, dyn_carry, dec_carry = carry
