@@ -150,14 +150,20 @@ class Agent(embodied.jax.Agent):
           (B, T), {k: v.shape for k, v in updates.items()})
       outs['replay'] = updates
     
-    if "replay" in outs:
-      outs = self.calc_uncertainty(outs)
+    # Uncertainty
+    # outs = self.calc_uncertainty(outs)
+    # current_stoch = {
+    #   "dyn/deter": outs["replay"]["dyn/deter"][0,0],
+    #   "dyn/stoch": outs["replay"]["dyn/stoch"][0,0],
+    # }
+    # print(f"shapes deter-stoch: {current_stoch['dyn/deter'].shape}, {current_stoch['dyn/stoch'].shape}")
+    # next_stoch = self.pred_next(current_stoch)
+    # print("succes")
 
+    # Priority (not working)
     # if self.config.replay.fracs.priority > 0:
     #   outs['replay']['priority'] = losses['model']
-    # outs['replay']["prevact"] = jax.tree.map(
-        # lambda x: x[:, -1], prevact)
-    
+
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics
 
@@ -213,6 +219,27 @@ class Agent(embodied.jax.Agent):
     print("--------------------------------------")
 
     return outs
+  
+  def pred_next(self, t):
+    world_model = self.dyn
+    carry = ({
+      "deter": jnp.expand_dims(t['dyn/deter'],0), # The latent state h
+      "stoch": jnp.expand_dims(t['dyn/stoch'],0), # The discrete state z
+    })
+    carry = jax.tree_map(jax.device_put, carry)
+   
+    policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
+    action = policy(sg(carry)) if callable(policy) else policy
+    actemb = nn.DictConcat(world_model.act_space, 1)(action)
+    next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
+    next_logit = world_model._prior(next_deter)
+    next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
+
+    jax.debug.print(
+        "Predicted next stoch: {next_stoch}",
+        next_stoch=next_stoch)
+
+    return next_stoch
 
   def loss(self, carry, obs, prevact, training):
     enc_carry, dyn_carry, dec_carry = carry

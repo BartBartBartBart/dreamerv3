@@ -5,38 +5,51 @@ import numpy as np
 
 
 class Uncertainty:
-  """
-  Select items with the highest uncertainty.
-  """
 
-  def __init__(self):
+  def __init__(self, seed=0):
+    self.uncertainty = {}
     self.keys = []
-    self.uncertainty = []
+    self.lock = threading.Lock()
 
-  def __call__(self):
-    index = np.argmax(self.uncertainty)
-    return self.keys[index]
-  
   def __len__(self):
     return len(self.keys)
-  
-  def __setitem__(self, key, model_pred, gt):
-    if key not in self.keys:
-      self.keys.append(key)
-      kl_div = self.calc_uncertainty(model_pred, gt)
-      self.uncertainty.append(kl_div)
-  
-  def __delitem__(self, key):
-    index = self.keys.index(key)
-    del self.keys[index]
-    del self.uncertainty[index]
 
-  def calc_uncertainty(self, model_pred, gt):
-    """
-    Calculate KL-divergence between model prediction and ground truth.
-    """
-    kl_div = np.sum(gt * (np.log(gt) - np.log(model_pred)))
-    return kl_div
+  def __call__(self):
+    with self.lock:
+      index = np.argmax([self.uncertainty[itemid] for itemid in self.keys])
+      # print(f"Index: {index}")
+      # print(f"Uncertainty: {self.uncertainty}")
+      # print(f"Keys: {self.keys}")
+      # print(f"Uncertainty: {self.uncertainty[self.keys[index]]}")
+      # print(f"Key: {self.keys[index]}")
+      return self.keys[index]
+
+  def __setitem__(self, itemid, stepids, uncertainty_val=0.0):
+    with self.lock:
+      if itemid not in [self.uncertainty.keys()]:
+        self.keys.append(itemid)
+      self.uncertainty[itemid] = uncertainty_val
+
+  def __delitem__(self, itemid):
+    with self.lock:
+      assert 2 <= len(self), len(self)
+      index = self.uncertainty.pop(itemid)
+      last = self.keys.pop()
+      if index != len(self.keys):
+        self.keys[index] = last
+        self.uncertainty[last] = index
+
+  def list_items(self):
+    with self.lock:
+      return list(self.uncertainty.keys())
+
+  def update_uncertainty(self, itemid, uncertainty_val):
+    with self.lock:
+      if itemid in [self.uncertainty.keys()]:
+        self.uncertainty[itemid] = uncertainty_val
+      # else:
+        # raise KeyError(f"Key {itemid} not found in uncertainty dictionary.")
+
 
 class Fifo:
 
@@ -74,6 +87,7 @@ class Uniform:
   def __call__(self):
     with self.lock:
       index = self.rng.integers(0, len(self.keys)).item()
+      # print(f"Index: {index}")
       return self.keys[index]
 
   def __setitem__(self, key, stepids):

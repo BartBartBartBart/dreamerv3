@@ -9,11 +9,13 @@ import jax
 from functools import partial
 import ninjax as nj
 
+from embodied.core.selectors import Uncertainty
+
 
 def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
   agent = make_agent()
-  replay = make_replay()
+  replay = make_replay(pred_next=agent.model.pred_next)
   logger = make_logger()
 
   logdir = elements.Path(args.logdir)
@@ -58,14 +60,31 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
         result['reward_rate'] = (np.abs(rew[1:] - rew[:-1]) >= 0.01).mean()
       epstats.add(result)
 
+  def uncertainty_replay(tran, worker):
+    t = {k: jax.device_put(v) for k, v in tran.items() if k.startswith('dyn/')}
+    t = jax.device_put(t)
+    # print(f"Shape deter: {t['dyn/deter'].shape}")
+    # print(f"Shape stoch: {t['dyn/stoch'].shape}")
+    # print(f"Device: {t['dyn/stoch'].devices()}")
+    t1 = agent.model.pred_next(t)
+    # print("Predicted stoch")
+    # print(f"Shape pred: {t1.shape}")
+    tran['uncertainty'] = t1
+    replay.add(tran, step=step, worker=worker)
+
   fns = [bind(make_env, i) for i in range(args.envs)]
   driver = embodied.Driver(fns, parallel=not args.debug)
   driver.on_step(lambda tran, _: step.increment())
   driver.on_step(lambda tran, _: policy_fps.step())
+  # driver.on_step(uncertainty_replay)
+  # if isinstance(replay.sampler, Uncertainty):
+  #   print("Using Uncertainty sampler")
+  #   driver.on_step(partial(replay.add, agent=agent))
+  # else:
   driver.on_step(replay.add)
   driver.on_step(logfn)
 
-  stream_train = iter(agent.stream(make_stream(replay, 'train')))
+  stream_train = iter(agent.stream(make_stream(replay, 'train', agent)))
   stream_report = iter(agent.stream(make_stream(replay, 'report')))
 
   carry_train = [agent.init_train(args.batch_size)]
@@ -77,48 +96,13 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
     for _ in range(should_train(step)):
       with elements.timer.section('stream_next'):
         batch = next(stream_train)
-      carry_train[0], outs, mets = agent.train(carry_train[0], batch)
+      carry_train[0], outs, mets = agent.train(carry_train[0], batch)     
 
       train_fps.step(batch_steps)
       if 'replay' in outs:
+        if 'uncertainty' in outs['replay']:
+          tran['uncertainty'] = outs['replay']['uncertainty']
         replay.update(outs['replay'])
-        continue
-        print("--------------------------------------")
-        # print(carry_train[0][1].__dict__.keys())
-        # print(outs["replay"].keys())
-        world_model = agent.model.dyn
-
-        deter = jnp.asarray(outs["replay"]["dyn/deter"][0], dtype=jnp.float32)
-        stoch = jnp.asarray(outs["replay"]["dyn/stoch"][0], dtype=jnp.float32)
-        print(f"length deter: {len(deter)}")
-        print(f"length stoch: {len(stoch)}")
-
-        carry = ({
-            "deter": deter, # The latent state h
-            "stoch": stoch, # The discrete state z
-        })
-        
-        sample = lambda xs: jax.tree.map(lambda x: x.sample(nj.seed()), xs)
-
-        # policy = nj.pure(lambda feat: sample(world_model.pol(world_model.feat2tensor(feat), 1)))
-        policy = lambda feat: sample(agent.model.pol(agent.model.feat2tensor(feat), 1))
-
-
-        sg = jax.lax.stop_gradient
-        import embodied.jax.nets as nn
-
-        if callable(policy):
-          print("Policy is callable")
-          action = policy(sg(carry)) 
-        else:
-          print("Policy is not callable")
-          policy
-        actemb = nn.DictConcat(world_model.act_space, 1)(action)
-        deter = world_model._core(carry['deter'], carry['stoch'], actemb)
-
-        print(f"deter: {deter}")
-
-        print("-------------------------------")
 
       train_agg.add(mets, prefix='train')
   driver.on_step(trainfn)
@@ -134,7 +118,6 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
   print('Start training loop')
   policy = lambda *args: agent.policy(*args, mode='train')
-  # driver.on_step(partial(trainfn, policy=policy))
   driver.reset(agent.init_policy)
   while step < args.steps:
 

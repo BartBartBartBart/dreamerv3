@@ -180,7 +180,7 @@ def make_logger(config):
   return logger
 
 
-def make_replay(config, folder, mode='train'):
+def make_replay(config, folder, mode='train', pred_next=None):
   batlen = config.batch_length if mode == 'train' else config.report_length
   consec = config.consec_train if mode == 'train' else config.consec_report
   capacity = config.replay.size if mode == 'train' else config.replay.size / 10
@@ -205,6 +205,11 @@ def make_replay(config, folder, mode='train'):
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
     kwargs['selector'] = embodied.replay.selectors.Prioritized(**config.replay.prio)
+
+  # Uncertainty
+  if config.replay.fracs.uncertainty == 1 and mode == 'train':
+    kwargs['selector'] = embodied.replay.selectors.Uncertainty()
+    kwargs['pred_next'] =  pred_next
 
   # Mixture
   elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
@@ -271,8 +276,11 @@ def wrap_env(env, config):
   return env
 
 
-def make_stream(config, replay, mode):
-  fn = bind(replay.sample, config.batch_size, mode)
+def make_stream(config, replay, mode, agent=None):
+  if agent is not None:
+    fn = bind(replay.sample, config.batch_size, mode, agent)
+  else:
+    fn = bind(replay.sample, config.batch_size, mode)
   stream = embodied.streams.Stateless(fn)
   stream = embodied.streams.Consec(
       stream,
