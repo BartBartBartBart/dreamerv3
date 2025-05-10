@@ -222,14 +222,18 @@ class Agent(embodied.jax.Agent):
   
   def pred_next(self, t):
     world_model = self.dyn
+    t = jax.tree_map(jax.device_put, t)
     carry = ({
       "deter": jnp.expand_dims(t['dyn/deter'],0), # The latent state h
       "stoch": jnp.expand_dims(t['dyn/stoch'],0), # The discrete state z
     })
     carry = jax.tree_map(jax.device_put, carry)
-   
-    policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
-    action = policy(sg(carry)) if callable(policy) else policy
+
+    action = self.prepare_single_action(t['action'])
+
+    print("action type:", type(action['action']), "dtype:", action['action'].dtype, "shape:", action['action'].shape)
+    print("Device of action:", action['action'].devices())
+    print("Device of action['action']:", action['action'].devices())
     actemb = nn.DictConcat(world_model.act_space, 1)(action)
     next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
     next_logit = world_model._prior(next_deter)
@@ -240,6 +244,17 @@ class Agent(embodied.jax.Agent):
         next_stoch=next_stoch)
 
     return next_stoch
+  
+  def prepare_single_action(self, action):
+    # Convert the action to an array
+    arr = jax.device_put(action)
+    arr = jnp.asarray(arr)
+    if arr.shape == ():  # scalar
+        arr = arr[None]
+    arr = arr.astype(self.dyn.act_space['action'].dtype)
+    action = {'action': jax.device_put(arr)}
+
+    return action
 
   def loss(self, carry, obs, prevact, training):
     enc_carry, dyn_carry, dec_carry = carry

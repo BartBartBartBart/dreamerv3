@@ -169,6 +169,7 @@ class Replay:
     message = f'Replay buffer {self.name} is empty'
     limiters.wait(lambda: len(self.sampler), message)
     if agent is not None:
+      # pass
       self.uncertainty_sample(batch, mode, agent)
     seqs, is_online = zip(*[self._sample(mode) for _ in range(batch)])
     data = self._assemble_batch(seqs, 0, self.length)
@@ -183,7 +184,7 @@ class Replay:
       chunkid, index = self.items[itemid]
       t, t1 = self.get_sequence(chunkid, index, length=2)
       t = jax.device_put(t)
-      t1 = jax.device_put(t1)
+      # t1 = jax.device_put(t1)
       print("Uncertainty sample")
       print("t:", t.keys())
       print("t1:", t1.keys())

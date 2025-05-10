@@ -94,6 +94,8 @@ class RSSM(nj.Module):
   def imagine(self, carry, policy, length, training, single=False):
     if single:
       action = policy(sg(carry)) if callable(policy) else policy
+      # print("action: {}", action.keys())
+      # print("action type:", type(action['action']), "dtype:", action['action'].dtype, "shape:", action['action'].shape)
       actemb = nn.DictConcat(self.act_space, 1)(action)
       deter = self._core(carry['deter'], carry['stoch'], actemb)
       logit = self._prior(deter)
