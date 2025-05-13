@@ -6,49 +6,52 @@ import numpy as np
 
 class Uncertainty:
 
-  def __init__(self, seed=0):
-    self.uncertainty = {}
-    self.keys = []
+  def __init__(self, seed=0, weighted_sampling=True):
+    self.itemids = []
     self.lock = threading.Lock()
+    self.rng = np.random.default_rng(seed)
+    self.weighted_sampling = weighted_sampling
 
   def __len__(self):
-    return len(self.keys)
+    return len(self.itemids)
 
-  def __call__(self):
+  def __call__(self, uncertainty=None):
     with self.lock:
-      index = np.argmax([self.uncertainty[itemid] for itemid in self.keys])
-      # print(f"Index: {index}")
-      # print(f"Uncertainty: {self.uncertainty}")
-      # print(f"Keys: {self.keys}")
-      # print(f"Uncertainty: {self.uncertainty[self.keys[index]]}")
-      # print(f"Key: {self.keys[index]}")
-      return self.keys[index]
+      if not self.itemids:
+        raise ValueError("No itemids to sample from.")
+      if uncertainty is not None:
+        # uncertainty: dict {itemid: value}
+        values = np.array([uncertainty[itemid] for itemid in self.itemids])
+        if self.weighted_sampling:
+          if values.sum() > 0:
+            probs = values / values.sum()
+          else:
+            print(f"values.sum() < 0")
+            np.ones_like(values) / len(values)
+          assert np.isclose(probs.sum(), 1.0), f"Probabilities do not sum to 1: {probs.sum()}"
+          idx = self.rng.choice(len(self.itemids), p=probs)
+          # for i in range(len(values)):
+          #   print(f"uncertainty {self.itemids[i]}: {values[i]}, prob {probs[i]}")
+          # print(f"Sampled itemid: {self.itemids[idx]}")
+        else:
+          idx = np.argmax(values)
+      else:
+        idx = 0
+      # print(f"Uncertainty sampling idx: {idx}, itemid: {self.itemids[idx]}")
+      return self.itemids[idx]
 
-  def __setitem__(self, itemid, stepids, uncertainty_val=0.0):
+  def __setitem__(self, itemid, stepids):
     with self.lock:
-      if itemid not in [self.uncertainty.keys()]:
-        self.keys.append(itemid)
-      self.uncertainty[itemid] = uncertainty_val
+      if itemid not in self.itemids:
+        self.itemids.append(itemid)
 
   def __delitem__(self, itemid):
     with self.lock:
-      assert 2 <= len(self), len(self)
-      index = self.uncertainty.pop(itemid)
-      last = self.keys.pop()
-      if index != len(self.keys):
-        self.keys[index] = last
-        self.uncertainty[last] = index
+      self.itemids.remove(itemid)
 
   def list_items(self):
     with self.lock:
-      return list(self.uncertainty.keys())
-
-  def update_uncertainty(self, itemid, uncertainty_val):
-    with self.lock:
-      if itemid in [self.uncertainty.keys()]:
-        self.uncertainty[itemid] = uncertainty_val
-      # else:
-        # raise KeyError(f"Key {itemid} not found in uncertainty dictionary.")
+      return self.itemids
 
 
 class Fifo:

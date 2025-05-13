@@ -38,7 +38,7 @@ defaults:
 
   replay:
     size: 5e6
-    online: True
+    online: False
     fracs: {uniform: 0.0, priority: 0.0, recency: 0.0, uncertainty: 1.0}
     prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
     priosignal: model

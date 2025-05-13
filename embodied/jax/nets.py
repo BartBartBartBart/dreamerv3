@@ -74,6 +74,8 @@ def where(condition, xs, ys):
 
 
 def mask(xs, mask):
+  # xs = jax.device_put(xs)
+  # mask = jax.device_put(mask)
   return where(mask, xs, jax.tree.map(jnp.zeros_like, xs))
 
 
@@ -84,7 +86,7 @@ def available(*trees, bdims=None):
       if jnp.issubdtype(x.dtype, jnp.floating):
         mask = (x != -jnp.inf)
       elif jnp.issubdtype(x.dtype, jnp.signedinteger):
-        mask = (x != -1)
+        mask = (x != jnp.array(jax.device_put(-1), dtype=x.dtype))
       elif (
           jnp.issubdtype(x.dtype, jnp.unsignedinteger) or
           jnp.issubdtype(x.dtype, bool)):

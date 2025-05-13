@@ -19,7 +19,7 @@ def setup(
     jit=True,
     prealloc=False,
     mock_devices=0,
-    transfer_guard=True,
+    transfer_guard=False,
     deterministic=True,
     autotune=1,
     gpuflags=True,

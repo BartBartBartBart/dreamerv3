@@ -162,7 +162,7 @@ class Agent(embodied.jax.Agent):
 
     # Priority (not working)
     # if self.config.replay.fracs.priority > 0:
-    #   outs['replay']['priority'] = losses['model']
+      # outs['replay']['priority'] = losses['model']
 
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics
@@ -220,28 +220,20 @@ class Agent(embodied.jax.Agent):
 
     return outs
   
-  def pred_next(self, t):
+  def pred_next(self, timestep):
     world_model = self.dyn
-    t = jax.tree_map(jax.device_put, t)
+    timestep = jax.tree_map(jax.device_put, timestep)
     carry = ({
-      "deter": jnp.expand_dims(t['dyn/deter'],0), # The latent state h
-      "stoch": jnp.expand_dims(t['dyn/stoch'],0), # The discrete state z
+      "deter": nn.cast(jnp.expand_dims(timestep['dyn/deter'],0)), # The latent state h
+      "stoch": nn.cast(jnp.expand_dims(timestep['dyn/stoch'],0)), # The discrete state z
     })
-    carry = jax.tree_map(jax.device_put, carry)
+    # carry = jax.tree_map(jax.device_put, carry)
 
-    action = self.prepare_single_action(t['action'])
-
-    print("action type:", type(action['action']), "dtype:", action['action'].dtype, "shape:", action['action'].shape)
-    print("Device of action:", action['action'].devices())
-    print("Device of action['action']:", action['action'].devices())
+    action = self.prepare_single_action(timestep['action'])
     actemb = nn.DictConcat(world_model.act_space, 1)(action)
     next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
     next_logit = world_model._prior(next_deter)
     next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
-
-    jax.debug.print(
-        "Predicted next stoch: {next_stoch}",
-        next_stoch=next_stoch)
 
     return next_stoch
   

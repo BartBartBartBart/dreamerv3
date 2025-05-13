@@ -82,8 +82,6 @@ class Replay:
 
   @elements.timer.section('replay_add')
   def add(self, step, worker=0, agent=None):
-    if 'uncertainty' in step:
-      print("Uncertainty:", step['uncertainty'])
     step = {k: v for k, v in step.items() if not k.startswith('log/')}
     with self.rwlock.reading:
       step = {k: np.asarray(v) for k, v in step.items()}
@@ -118,30 +116,6 @@ class Replay:
         # Increment is not thread safe thus inaccurate but faster than locking.
         self.metrics['inserts'] += 1
         chunkid, index = stream.popleft()
-
-        # Calculate the uncertainty for the current step
-        if agent is not None:
-          t, t1 = self.get_sequence(chunkid, index, length=2)
-          t = jax.device_put(t)
-          t1 = jax.device_put(t1)
-          print("t:", t.keys())
-          print("t1:", t1.keys())
-          pred = agent.model.pred_next(t)
-          print("Predicted stoch")
-          print(pred)
-
-          # print("Devices: ", jax.devices())
-          # outs = {
-          #   'replay': {
-          #     'dyn/deter': jax.device_put(jnp.array([t['dyn/deter'], t1['dyn/deter']])),
-          #     'dyn/stoch': jax.device_put(jnp.array([t['dyn/stoch'], t1['dyn/stoch']])),
-          #   }
-          # }
-          # idx = (jnp.array(0))
-          # print(outs['replay']['dyn/deter'][0].shape)
-          # outs = agent.model.calc_uncertainty(t, t1)
-          # print("Uncertainty:", outs['replay']['uncertainty'])
-
         self._insert(chunkid, index)
 
         if self.online and self.lengths[worker] % self.length == 0:
@@ -150,28 +124,16 @@ class Replay:
       if self.online:
         self.lengths[worker] += 1
 
-  def get_sequence(self, chunkid, index, length=2):
-    # Retrieve a sequence of timesteps
-    sequence = self._getseq(chunkid, index, concat=True)
-
-    # Ensure the sequence has at least two timesteps
-    if len(sequence['stepid']) < length:
-        raise ValueError("Not enough timesteps in the sequence.")
-
-    # Extract the current and next timesteps
-    current_timestep = {k: v[0] for k, v in sequence.items()}
-    next_timestep = {k: v[1] for k, v in sequence.items()}
-
-    return current_timestep, next_timestep
-
   @elements.timer.section('replay_sample')
   def sample(self, batch, mode='train', agent=None):
     message = f'Replay buffer {self.name} is empty'
     limiters.wait(lambda: len(self.sampler), message)
     if agent is not None:
-      # pass
-      self.uncertainty_sample(batch, mode, agent)
-    seqs, is_online = zip(*[self._sample(mode) for _ in range(batch)])
+      uncertainty = self.uncertainty_sample(batch, mode, agent)
+      seqs, is_online, itemid = zip(*[self._sample(mode, uncertainty) for _ in range(batch)])
+      # print(f"Sampled batch {itemid}")
+    else:
+      seqs, is_online, itemid = zip(*[self._sample(mode) for _ in range(batch)])
     data = self._assemble_batch(seqs, 0, self.length)
     data = self._annotate_batch(data, is_online, True)
     return data
@@ -180,18 +142,35 @@ class Replay:
     """
     For each itemid in self.sampler, calculate the uncertainty
     """
+    uncertainty = {}
     for itemid in self.sampler.list_items():
       chunkid, index = self.items[itemid]
-      t, t1 = self.get_sequence(chunkid, index, length=2)
-      t = jax.device_put(t)
-      # t1 = jax.device_put(t1)
-      print("Uncertainty sample")
-      print("t:", t.keys())
-      print("t1:", t1.keys())
-      pred = self._pure_pred_next({}, t, seed=self.seed)
-      print("Predicted stoch")
-      print(pred)
+      sequence = self._getseq(chunkid, index, concat=True)
+      
+      # Calculate average uncertainty for the sequence
+      mean_uncertainty = 0
+      for idx in range(len(sequence['dyn/stoch']) - 1):
+        current_timestep = {
+          'dyn/deter': sequence['dyn/deter'][idx],
+          'dyn/stoch': sequence['dyn/stoch'][idx],\
+          'action': sequence['action'][idx],
+        }
+        true_next_stoch = sequence['dyn/stoch'][idx+1]
 
+        # Predict the next timestep based on the current timestep
+        state, pred_next_stoch = self._pure_pred_next({}, current_timestep, seed=self.seed, create=True)
+
+        # Calculate the uncertainty
+        pred_distr = agent.model.dyn._dist(pred_next_stoch)
+        true_distr = agent.model.dyn._dist(true_next_stoch)
+        mean_uncertainty += pred_distr.kl(true_distr)[0]
+      
+      mean_uncertainty /= len(sequence['dyn/stoch']) - 1
+      uncertainty[itemid] = mean_uncertainty
+      # print(f"Itemid {itemid} - Uncertainty: {mean_uncertainty}")
+      
+    return uncertainty
+  
   @elements.timer.section('replay_update')
   def update(self, data):
     stepid = data.pop('stepid')
@@ -199,30 +178,23 @@ class Replay:
     uncertainty = data.pop('uncertainty', None)
     assert stepid.ndim == 3, stepid.shape
     self.metrics['updates'] += int(np.prod(stepid.shape[:-1]))
-    # print("PRIORITY:", priority)
-    # print(f"Uncertainty shape: {uncertainty['stoch'].shape}")
-    # print("Dyn/deter ", data['dyn/deter'].shape)
-    # print("Dyn/stoch ", data['dyn/stoch'].shape)
-    # print("stepid ", stepid.shape)
-    # print(stepid[0,0,0])
-    # print("stepid ", stepid[0].shape)
+
     if priority is not None:
       assert priority.ndim == 2, priority.shape
       self.sampler.prioritize(
           stepid.reshape((-1, stepid.shape[-1])),
           priority.flatten())
       
-    if uncertainty is not None: 
-      assert uncertainty['stoch'].shape[0] == stepid.shape[0], "Uncertainty shape mismatch"
-      uncertainty = uncertainty['stoch']
-      for seq_idx, uval in enumerate(uncertainty):
-        itemid = stepid[seq_idx,0,0]
-        if itemid in self.sampler.keys:
-          self.sampler.update_uncertainty(itemid, uval)
-        else:
-          print(f"Itemid {itemid} not found in sampler keys")
-    
-      
+    # if uncertainty is not None: 
+    #   assert uncertainty['stoch'].shape[0] == stepid.shape[0], "Uncertainty shape mismatch"
+    #   uncertainty = uncertainty['stoch']
+    #   for seq_idx, uval in enumerate(uncertainty):
+    #     itemid = stepid[seq_idx,0,0]
+    #     if itemid in self.sampler.keys:
+    #       self.sampler.update_uncertainty(itemid, uval)
+    #     else:
+    #       print(f"Itemid {itemid} not found in sampler keys")
+  
     if data:
       for i, stepid in enumerate(stepid):
         stepid = stepid[0].tobytes()
@@ -234,7 +206,7 @@ class Replay:
         except KeyError:
           pass
 
-  def _sample(self, mode):
+  def _sample(self, mode, uncertainty=None):
     assert mode in ('train', 'report', 'eval'), mode
     if mode == 'train':
       # Increment is not thread safe thus inaccurate but faster than locking.
@@ -246,11 +218,14 @@ class Replay:
           is_online = True
         else:
           with elements.timer.section('sample'):
-            itemid = self.sampler()
+            if uncertainty is not None:
+              itemid = self.sampler(uncertainty)
+            else:
+              itemid = self.sampler()
           chunkid, index = self.items[itemid]
           is_online = False
         seq = self._getseq(chunkid, index, concat=False)
-        return seq, is_online
+        return seq, is_online, itemid
       except KeyError:
         continue
 
