@@ -188,7 +188,7 @@ class Replay:
       print("Uncertainty sample")
       print("t:", t.keys())
       print("t1:", t1.keys())
-      pred = self._pure_pred_next({}, t, seed=self.seed)
+      pred = self._pure_pred_next({}, t, seed=self.seed, create=True)
       print("Predicted stoch")
       print(pred)
 

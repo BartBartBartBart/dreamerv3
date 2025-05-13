@@ -183,8 +183,8 @@ class Agent(embodied.jax.Agent):
       # For each time step in the sequence
       for t in range(deter.shape[1]-1): 
         carry = ({
-            "deter": jnp.expand_dims(deter[seq,t],0), # The latent state h
-            "stoch": jnp.expand_dims(stoch[seq,t],0), # The discrete state z
+            "deter": nn.cast(jnp.expand_dims(deter[seq,t],0)), # The latent state h
+            "stoch": nn.cast(jnp.expand_dims(stoch[seq,t],0)), # The discrete state z
         })
         actual_next_stoch = jnp.expand_dims(stoch[seq,t+1],0)
         actual_next_deter = jnp.expand_dims(deter[seq,t+1],0)
@@ -224,8 +224,8 @@ class Agent(embodied.jax.Agent):
     world_model = self.dyn
     t = jax.tree_map(jax.device_put, t)
     carry = ({
-      "deter": jnp.expand_dims(t['dyn/deter'],0), # The latent state h
-      "stoch": jnp.expand_dims(t['dyn/stoch'],0), # The discrete state z
+      "deter": nn.cast(jnp.expand_dims(t['dyn/deter'],0)), # The latent state h
+      "stoch": nn.cast(jnp.expand_dims(t['dyn/stoch'],0)), # The discrete state z
     })
     carry = jax.tree_map(jax.device_put, carry)
 
