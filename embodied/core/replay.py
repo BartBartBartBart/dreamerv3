@@ -129,18 +129,25 @@ class Replay:
     message = f'Replay buffer {self.name} is empty'
     limiters.wait(lambda: len(self.sampler), message)
     if agent is not None:
-      uncertainty = self.uncertainty_sample(batch, mode, agent)
-      seqs, is_online, itemid = zip(*[self._sample(mode, uncertainty) for _ in range(batch)])
-      # print(f"Sampled batch {itemid}")
+      uncertainty = self.calc_uncertainty(agent)
+      seqs, is_online = zip(*[self._sample(mode, uncertainty) for _ in range(batch)])
     else:
-      seqs, is_online, itemid = zip(*[self._sample(mode) for _ in range(batch)])
+      seqs, is_online = zip(*[self._sample(mode) for _ in range(batch)])
     data = self._assemble_batch(seqs, 0, self.length)
     data = self._annotate_batch(data, is_online, True)
     return data
   
-  def uncertainty_sample(self, batch, mode='train', agent=None):
+  def calc_uncertainty(self, agent=None):
     """
-    For each itemid in self.sampler, calculate the uncertainty
+    Calculates uncertainty for each sequence in the replay buffer.
+    For each step in the sequence, we predict the next timestep and calculate the KL divergence.
+    The uncertainty is the average KL divergence over all steps in the sequence.
+
+    Args:
+      agent: The agent used to predict the next timestep.
+
+    Returns:
+      A dictionary with itemid as key and average uncertainty as value.
     """
     uncertainty = {}
     for itemid in self.sampler.list_items():
@@ -167,7 +174,6 @@ class Replay:
       
       mean_uncertainty /= len(sequence['dyn/stoch']) - 1
       uncertainty[itemid] = mean_uncertainty
-      # print(f"Itemid {itemid} - Uncertainty: {mean_uncertainty}")
       
     return uncertainty
   
@@ -175,7 +181,6 @@ class Replay:
   def update(self, data):
     stepid = data.pop('stepid')
     priority = data.pop('priority', None)
-    uncertainty = data.pop('uncertainty', None)
     assert stepid.ndim == 3, stepid.shape
     self.metrics['updates'] += int(np.prod(stepid.shape[:-1]))
 
@@ -184,17 +189,7 @@ class Replay:
       self.sampler.prioritize(
           stepid.reshape((-1, stepid.shape[-1])),
           priority.flatten())
-      
-    # if uncertainty is not None: 
-    #   assert uncertainty['stoch'].shape[0] == stepid.shape[0], "Uncertainty shape mismatch"
-    #   uncertainty = uncertainty['stoch']
-    #   for seq_idx, uval in enumerate(uncertainty):
-    #     itemid = stepid[seq_idx,0,0]
-    #     if itemid in self.sampler.keys:
-    #       self.sampler.update_uncertainty(itemid, uval)
-    #     else:
-    #       print(f"Itemid {itemid} not found in sampler keys")
-  
+       
     if data:
       for i, stepid in enumerate(stepid):
         stepid = stepid[0].tobytes()
@@ -225,7 +220,7 @@ class Replay:
           chunkid, index = self.items[itemid]
           is_online = False
         seq = self._getseq(chunkid, index, concat=False)
-        return seq, is_online, itemid
+        return seq, is_online
       except KeyError:
         continue
 

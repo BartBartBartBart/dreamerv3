@@ -64,6 +64,7 @@ def main(argv=None):
       consec_train=config.consec_train,
       consec_report=config.consec_report,
       replay_context=config.replay_context,
+      replay=config.replay,
   )
 
   if config.script == 'train':
@@ -279,7 +280,8 @@ def wrap_env(env, config):
 
 def make_stream(config, replay, mode, agent=None):
   if agent is not None:
-    fn = bind(replay.sample, config.batch_size, mode, agent)
+    # uncertainty sampling
+    fn = bind(replay.sample, config.batch_size, mode, agent) 
   else:
     fn = bind(replay.sample, config.batch_size, mode)
   stream = embodied.streams.Stateless(fn)

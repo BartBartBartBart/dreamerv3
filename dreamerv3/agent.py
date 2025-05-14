@@ -113,7 +113,6 @@ class Agent(embodied.jax.Agent):
     return self.init_policy(batch_size)
 
   def policy(self, carry, obs, mode='train'):
-    # print("POLICY")
     (enc_carry, dyn_carry, dec_carry, prevact) = carry
     kw = dict(training=False, single=True)
     reset = obs['is_first']
@@ -152,13 +151,6 @@ class Agent(embodied.jax.Agent):
     
     # Uncertainty
     # outs = self.calc_uncertainty(outs)
-    # current_stoch = {
-    #   "dyn/deter": outs["replay"]["dyn/deter"][0,0],
-    #   "dyn/stoch": outs["replay"]["dyn/stoch"][0,0],
-    # }
-    # print(f"shapes deter-stoch: {current_stoch['dyn/deter'].shape}, {current_stoch['dyn/stoch'].shape}")
-    # next_stoch = self.pred_next(current_stoch)
-    # print("succes")
 
     # Priority (not working)
     # if self.config.replay.fracs.priority > 0:
@@ -167,67 +159,79 @@ class Agent(embodied.jax.Agent):
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics
 
-  def calc_uncertainty(self, outs):
-    print("--------------------------------------")
-    world_model = self.dyn
-    deter = outs["replay"]["dyn/deter"] # To be added to the replay buffer
-    stoch = outs["replay"]["dyn/stoch"]
-    batch_stochs = []
-    batch_deters = []
+  # def calc_uncertainty(self, outs):
+  #   print("--------------------------------------")
+  #   world_model = self.dyn
+  #   deter = outs["replay"]["dyn/deter"] # To be added to the replay buffer
+  #   stoch = outs["replay"]["dyn/stoch"]
+  #   batch_stochs = []
+  #   batch_deters = []
 
-    # For each sequence in the batch
-    for seq in range(deter.shape[0]): 
-      mean_stoch_kl = 0
-      mean_deter_kl = 0
+  #   # For each sequence in the batch
+  #   for seq in range(deter.shape[0]): 
+  #     mean_stoch_kl = 0
+  #     mean_deter_kl = 0
       
-      # For each time step in the sequence
-      for t in range(deter.shape[1]-1): 
-        carry = ({
-            "deter": jnp.expand_dims(deter[seq,t],0), # The latent state h
-            "stoch": jnp.expand_dims(stoch[seq,t],0), # The discrete state z
-        })
-        actual_next_stoch = jnp.expand_dims(stoch[seq,t+1],0)
-        actual_next_deter = jnp.expand_dims(deter[seq,t+1],0)
+  #     # For each time step in the sequence
+  #     for t in range(deter.shape[1]-1): 
+  #       carry = ({
+  #           "deter": jnp.expand_dims(deter[seq,t],0), # The latent state h
+  #           "stoch": jnp.expand_dims(stoch[seq,t],0), # The discrete state z
+  #       })
+  #       actual_next_stoch = jnp.expand_dims(stoch[seq,t+1],0)
+  #       actual_next_deter = jnp.expand_dims(deter[seq,t+1],0)
         
-        policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
+  #       policy = lambda feat: sample(self.pol(self.feat2tensor(feat), 1))
 
-        # Calculate next state
-        action = policy(sg(carry)) if callable(policy) else policy
-        actemb = nn.DictConcat(world_model.act_space, 1)(action)
-        next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
-        next_logit = world_model._prior(next_deter)
-        next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
-        # next_carry = nn.cast(dict(deter=next_deter, stoch=next_stoch))
-        # next_feat = nn.cast(dict(deter=next_deter, stoch=next_stoch, logit=next_logit))
+  #       # Calculate next state
+  #       action = policy(sg(carry)) if callable(policy) else policy
+  #       actemb = nn.DictConcat(world_model.act_space, 1)(action)
+  #       next_deter = world_model._core(carry['deter'], carry['stoch'], actemb)
+  #       next_logit = world_model._prior(next_deter)
+  #       next_stoch = nn.cast(world_model._dist(next_logit).sample(seed=nj.seed()))
+  #       # next_carry = nn.cast(dict(deter=next_deter, stoch=next_stoch))
+  #       # next_feat = nn.cast(dict(deter=next_deter, stoch=next_stoch, logit=next_logit))
 
-        # Calculate uncertainty with KL divergence
-        mean_stoch_kl += world_model._dist(next_stoch).kl(world_model._dist(actual_next_stoch))[0]
-        mean_deter_kl += world_model._dist(next_deter).kl(world_model._dist(actual_next_deter)) # unnecessary?
+  #       # Calculate uncertainty with KL divergence
+  #       mean_stoch_kl += world_model._dist(next_stoch).kl(world_model._dist(actual_next_stoch))[0]
+  #       mean_deter_kl += world_model._dist(next_deter).kl(world_model._dist(actual_next_deter)) # unnecessary?
         
-      mean_stoch_kl /= (deter.shape[1]-1)
-      mean_deter_kl /= (deter.shape[1]-1)
-      batch_stochs.append(mean_stoch_kl)
-      batch_deters.append(mean_deter_kl)
+  #     mean_stoch_kl /= (deter.shape[1]-1)
+  #     mean_deter_kl /= (deter.shape[1]-1)
+  #     batch_stochs.append(mean_stoch_kl)
+  #     batch_deters.append(mean_deter_kl)
 
-    batch_stochs = jnp.array(batch_stochs)
-    batch_deters = jnp.array(batch_deters)
-    jax.debug.print(
-        "Batch stoch KL: {batch_stochs}, Batch deter KL: {batch_deters}",
-        batch_stochs=batch_stochs, batch_deters=batch_deters)
-    outs["replay"]["uncertainty/stochs"] = batch_stochs # (B)
-    outs["replay"]["uncertainty/deter"] = batch_deters # (B)
-    print("--------------------------------------")
+  #   batch_stochs = jnp.array(batch_stochs)
+  #   batch_deters = jnp.array(batch_deters)
+  #   jax.debug.print(
+  #       "Batch stoch KL: {batch_stochs}, Batch deter KL: {batch_deters}",
+  #       batch_stochs=batch_stochs, batch_deters=batch_deters)
+  #   outs["replay"]["uncertainty/stochs"] = batch_stochs # (B)
+  #   outs["replay"]["uncertainty/deter"] = batch_deters # (B)
+  #   print("--------------------------------------")
 
-    return outs
+  #   return outs
   
   def pred_next(self, timestep):
+    """
+    Predicts the next discrete representation (z_{t+1}) and 
+    latent representation (h_{t+1}) with the world model given the current timestep.
+
+    Args:
+      timestep: A dictionary containing the current timestep data, including:
+        - 'dyn/deter': The current latent state h_t
+        - 'dyn/stoch': The current discrete state z_t
+        - 'action': The action taken at the current timestep
+        
+    Returns:
+      next_stoch: The predicted next discrete representation (z_{t+1})
+    """
     world_model = self.dyn
     timestep = jax.tree_map(jax.device_put, timestep)
     carry = ({
       "deter": nn.cast(jnp.expand_dims(timestep['dyn/deter'],0)), # The latent state h
       "stoch": nn.cast(jnp.expand_dims(timestep['dyn/stoch'],0)), # The discrete state z
     })
-    # carry = jax.tree_map(jax.device_put, carry)
 
     action = self.prepare_single_action(timestep['action'])
     actemb = nn.DictConcat(world_model.act_space, 1)(action)
@@ -238,11 +242,19 @@ class Agent(embodied.jax.Agent):
     return next_stoch
   
   def prepare_single_action(self, action):
-    # Convert the action to an array
+    """
+    Prepares a single action for the world model.
+
+    Args:
+      action: The action to be prepared.
+
+    Returns:
+      action: The prepared action.
+    """
     arr = jax.device_put(action)
     arr = jnp.asarray(arr)
     if arr.shape == ():  # scalar
-        arr = arr[None]
+      arr = arr[None]
     arr = arr.astype(self.dyn.act_space['action'].dtype)
     action = {'action': jax.device_put(arr)}
 

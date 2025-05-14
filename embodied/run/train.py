@@ -4,12 +4,6 @@ from functools import partial as bind
 import elements
 import embodied
 import numpy as np
-import jax.numpy as jnp
-import jax
-from functools import partial
-import ninjax as nj
-
-from embodied.core.selectors import Uncertainty
 
 
 def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
@@ -60,31 +54,17 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
         result['reward_rate'] = (np.abs(rew[1:] - rew[:-1]) >= 0.01).mean()
       epstats.add(result)
 
-  def uncertainty_replay(tran, worker):
-    t = {k: jax.device_put(v) for k, v in tran.items() if k.startswith('dyn/')}
-    t = jax.device_put(t)
-    # print(f"Shape deter: {t['dyn/deter'].shape}")
-    # print(f"Shape stoch: {t['dyn/stoch'].shape}")
-    # print(f"Device: {t['dyn/stoch'].devices()}")
-    t1 = agent.model.pred_next(t)
-    # print("Predicted stoch")
-    # print(f"Shape pred: {t1.shape}")
-    tran['uncertainty'] = t1
-    replay.add(tran, step=step, worker=worker)
-
   fns = [bind(make_env, i) for i in range(args.envs)]
   driver = embodied.Driver(fns, parallel=not args.debug)
   driver.on_step(lambda tran, _: step.increment())
   driver.on_step(lambda tran, _: policy_fps.step())
-  # driver.on_step(uncertainty_replay)
-  # if isinstance(replay.sampler, Uncertainty):
-  #   print("Using Uncertainty sampler")
-  #   driver.on_step(partial(replay.add, agent=agent))
-  # else:
   driver.on_step(replay.add)
   driver.on_step(logfn)
 
-  stream_train = iter(agent.stream(make_stream(replay, 'train', agent)))
+  if args.replay.fracs.uncertainty == 1.0:
+    stream_train = iter(agent.stream(make_stream(replay, 'train', agent)))
+  else:
+    stream_train = iter(agent.stream(make_stream(replay, 'train')))
   stream_report = iter(agent.stream(make_stream(replay, 'report')))
 
   carry_train = [agent.init_train(args.batch_size)]
@@ -100,8 +80,6 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
 
       train_fps.step(batch_steps)
       if 'replay' in outs:
-        if 'uncertainty' in outs['replay']:
-          tran['uncertainty'] = outs['replay']['uncertainty']
         replay.update(outs['replay'])
 
       train_agg.add(mets, prefix='train')

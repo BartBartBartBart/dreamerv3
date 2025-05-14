@@ -5,6 +5,16 @@ import numpy as np
 
 
 class Uncertainty:
+  """
+  Uncertainty-based sampling selector. Does weighted sampling based on
+  uncertainty values. If no uncertainty is provided, it defaults to
+  sampling the first item in the list.
+
+  Args:
+    seed: Random seed for sampling.
+    weighted_sampling: If True, samples based on uncertainty values.
+      If False, samples the first item in the list.
+  """
 
   def __init__(self, seed=0, weighted_sampling=True):
     self.itemids = []
@@ -20,24 +30,19 @@ class Uncertainty:
       if not self.itemids:
         raise ValueError("No itemids to sample from.")
       if uncertainty is not None:
-        # uncertainty: dict {itemid: value}
         values = np.array([uncertainty[itemid] for itemid in self.itemids])
         if self.weighted_sampling:
           if values.sum() > 0:
             probs = values / values.sum()
           else:
-            print(f"values.sum() < 0")
+            # print(f"values.sum() < 0")
             np.ones_like(values) / len(values)
           assert np.isclose(probs.sum(), 1.0), f"Probabilities do not sum to 1: {probs.sum()}"
           idx = self.rng.choice(len(self.itemids), p=probs)
-          # for i in range(len(values)):
-          #   print(f"uncertainty {self.itemids[i]}: {values[i]}, prob {probs[i]}")
-          # print(f"Sampled itemid: {self.itemids[idx]}")
         else:
           idx = np.argmax(values)
       else:
         idx = 0
-      # print(f"Uncertainty sampling idx: {idx}, itemid: {self.itemids[idx]}")
       return self.itemids[idx]
 
   def __setitem__(self, itemid, stepids):
