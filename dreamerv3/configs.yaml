@@ -161,8 +161,8 @@ dmlab:
 
 atari:
   task: atari_pong
-  # run: {steps: 240, train_ratio: 32}
-  run: {steps: 5.1e7, train_ratio: 32}
+  run: {steps: 240, train_ratio: 32}
+  # run: {steps: 5.1e7, train_ratio: 32}
 
 procgen:
   task: procgen_coinrun
