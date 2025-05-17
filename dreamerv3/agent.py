@@ -149,13 +149,16 @@ class Agent(embodied.jax.Agent):
           (B, T), {k: v.shape for k, v in updates.items()})
       outs['replay'] = updates
     
-    # Uncertainty
-    # outs = self.calc_uncertainty(outs)
-    # print("what is in this???: ", self.config)
-    if self.config.replay.fracs.priority > 0:
-      # outs['replay']['priority'] = losses['model'] original but does not work :/
-      priority = metrics["loss/dyn"] + metrics["loss/rep"] # New lines from Jason, replaces losses['model']
-      outs['replay']['priority'] = priority # add priority to the output
+    # if self.config.replay.fracs.priority > 0:
+    #   # outs['replay']['priority'] = losses['model'] original but does not work :/
+    #   priority = metrics["loss/dyn"] + metrics["loss/rep"] # New lines from Jason, replaces losses['model']
+    #   outs['replay']['priority'] = priority # add priority to the output
+
+    if self.config.replay.fracs.uncertainty == 1.0:
+      priority = metrics["loss/dyn"] + metrics["loss/rep"]
+      priority_update = elements.tree.flatdict(dict(
+        stepid=stepid, priority = priority))
+      outs['replay']['priority'] = priority_update # add priority to the output
 
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics
