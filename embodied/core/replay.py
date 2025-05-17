@@ -26,7 +26,6 @@ class Replay:
     self.name = name
 
     self.sampler = selector if selector is not None else selectors.Uniform(seed)
-    print("Sampler:", self.sampler)
 
     self._pure_pred_next = nj.pure(pred_next, nested=True)
     self.seed = jax.random.PRNGKey(jax.device_put(seed))

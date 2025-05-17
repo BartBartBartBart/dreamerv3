@@ -6,10 +6,11 @@ import embodied
 import numpy as np
 
 
-def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
+def train(make_agent, make_replay_train, make_replay_report, make_env, make_stream, make_logger, args):
 
   agent = make_agent()
-  replay = make_replay(pred_next=agent.model.pred_next)
+  replay = make_replay_train(pred_next=agent.model.pred_next)
+  replay_report = make_replay_report()
   logger = make_logger()
 
   logdir = elements.Path(args.logdir)
@@ -59,13 +60,14 @@ def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
   driver.on_step(lambda tran, _: step.increment())
   driver.on_step(lambda tran, _: policy_fps.step())
   driver.on_step(replay.add)
+  driver.on_step(replay_report.add)
   driver.on_step(logfn)
 
   if args.replay.fracs.uncertainty == 1.0:
     stream_train = iter(agent.stream(make_stream(replay, 'train', agent)))
   else:
     stream_train = iter(agent.stream(make_stream(replay, 'train')))
-  stream_report = iter(agent.stream(make_stream(replay, 'report')))
+  stream_report = iter(agent.stream(make_stream(replay_report, 'report')))
 
   carry_train = [agent.init_train(args.batch_size)]
   carry_report = agent.init_report(args.batch_size)

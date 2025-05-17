@@ -6,7 +6,7 @@ defaults:
   method: name
   task: dummy_disc
   seed: 0
-  script: train
+  script: train_eval
   batch_size: 16
   batch_length: 64
   report_length: 32

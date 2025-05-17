@@ -115,7 +115,6 @@ class Uniform:
   def __call__(self):
     with self.lock:
       index = self.rng.integers(0, len(self.keys)).item()
-      # print(f"Index: {index}")
       return self.keys[index]
 
   def __setitem__(self, key, stepids):

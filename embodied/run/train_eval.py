@@ -9,6 +9,7 @@ import numpy as np
 def train_eval(
     make_agent,
     make_replay_train,
+    make_replay_report,
     make_replay_eval,
     make_env_train,
     make_env_eval,
@@ -17,7 +18,8 @@ def train_eval(
     args):
 
   agent = make_agent()
-  replay_train = make_replay_train()
+  replay_train = make_replay_train(pred_next=agent.model.pred_next)
+  replay_report = make_replay_report()
   replay_eval = make_replay_eval()
   logger = make_logger()
 
@@ -74,6 +76,7 @@ def train_eval(
   driver_train.on_step(lambda tran, _: step.increment())
   driver_train.on_step(lambda tran, _: policy_fps.step())
   driver_train.on_step(replay_train.add)
+  driver_train.on_step(replay_report.add)
   driver_train.on_step(bind(logfn, mode='train'))
 
   fns = [bind(make_env_eval, i) for i in range(args.eval_envs)]
@@ -82,8 +85,11 @@ def train_eval(
   driver_eval.on_step(bind(logfn, mode='eval'))
   driver_eval.on_step(lambda tran, _: policy_fps.step())
 
-  stream_train = iter(agent.stream(make_stream(replay_train, 'train')))
-  stream_report = iter(agent.stream(make_stream(replay_train, 'report')))
+  if args.replay.fracs.uncertainty == 1.0:
+    stream_train = iter(agent.stream(make_stream(replay_train, 'train', agent)))
+  else: 
+    stream_train = iter(agent.stream(make_stream(replay_train, 'train')))
+  stream_report = iter(agent.stream(make_stream(replay_report, 'report')))
   stream_eval = iter(agent.stream(make_stream(replay_eval, 'eval')))
 
   carry_train = [agent.init_train(args.batch_size)]
