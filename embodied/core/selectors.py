@@ -58,9 +58,9 @@ class Uncertainty:
       else:
         idx = np.argsort(values)[-batch_size:]
 
-    # If no uncertainty is provided, sample the first item.
+    # If no uncertainty is provided, do uniform sampling.
     else:
-      idx = 0
+      idx = self.rng.choice(len(itemids), size=batch_size, replace=False)[0]
       return idx
     
     return [self.itemids[id] for id in idx]

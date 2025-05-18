@@ -71,7 +71,6 @@ def main(argv=None):
     embodied.run.train(
         bind(make_agent, config),
         bind(make_replay, config, 'replay'),
-        bind(make_replay, config, 'replay_eval', 'report'),
         bind(make_env, config),
         bind(make_stream, config),
         bind(make_logger, config),
@@ -81,7 +80,6 @@ def main(argv=None):
     embodied.run.train_eval(
         bind(make_agent, config),
         bind(make_replay, config, 'replay'),
-        bind(make_replay, config, 'replay_eval', 'report'),
         bind(make_replay, config, 'eval_replay', 'eval'),
         bind(make_env, config),
         bind(make_env, config),
@@ -287,7 +285,7 @@ def wrap_env(env, config):
 
 
 def make_stream(config, replay, mode, agent=None):
-  if agent is not None:
+  if agent is not None and mode == 'train':
     # uncertainty sampling
     fn = bind(replay.sample, config.batch_size, mode, agent) 
   else:
