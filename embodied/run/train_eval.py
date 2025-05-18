@@ -4,6 +4,7 @@ from functools import partial as bind
 import elements
 import embodied
 import numpy as np
+import threading
 
 
 def train_eval(
@@ -39,6 +40,7 @@ def train_eval(
   should_log = elements.when.Clock(args.log_every)
   should_report = elements.when.Clock(args.report_every)
   should_save = elements.when.Clock(args.save_every)
+  should_update_uncertainty = elements.when.Every(args.update_uncertainty_every)
 
   @elements.timer.section('logfn')
   def logfn(tran, worker, mode):
@@ -142,6 +144,11 @@ def train_eval(
       if len(replay_eval):
         carry_eval, mets = reportfn(carry_eval, stream_eval)
         logger.add(mets, prefix='eval')
+
+    if args.replay.fracs.uncertainty == 1.0 and should_update_uncertainty(step):
+      print(f'Updating uncertainty - step {int(step)}')
+      uncertainties, itemids = replay_train.calc_uncertainty(agent)
+      replay_train.sampler.update_uncertainty(uncertainties, itemids)
 
     driver_train(train_policy, steps=10)
 

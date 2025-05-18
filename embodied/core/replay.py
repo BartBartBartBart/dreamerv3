@@ -26,6 +26,7 @@ class Replay:
     self.name = name
 
     self.sampler = selector if selector is not None else selectors.Uniform(seed)
+    self.uncertainty = True if isinstance(self.sampler, selectors.Uncertainty) else False
 
     self._pure_pred_next = nj.pure(pred_next, nested=True)
     self.seed = jax.random.PRNGKey(jax.device_put(seed))
@@ -129,10 +130,8 @@ class Replay:
     limiters.wait(lambda: len(self.sampler), message)
 
     # Uncertainty sampling
-    if agent is not None:
-      # Uncertainty calulation and sampling
-      uncertainty, itemids = self.calc_uncertainty(agent)
-      itemids = self.sampler(uncertainty, batch_size=batch, itemids=itemids)
+    if self.uncertainty:
+      itemids = self.sampler(batch_size=batch, mode=mode)
 
       # Gather sequences from itemids
       seqs, is_online = [], []
@@ -164,49 +163,21 @@ class Replay:
       uncertainty: A dictionary mapping item IDs to their corresponding uncertainty values.
       itemids: A list of item IDs. For threading safety, this is a copy of the item IDs in the sampler.
     """
-    # uncertainty = {}
-    # itemids = self.sampler.list_items()
-    # for itemid in itemids:
-    #   chunkid, index = self.items[itemid]
-    #   sequence = self._getseq(chunkid, index, concat=True)
-      
-    #   # Calculate average uncertainty for the sequence
-    #   mean_uncertainty = 0
-    #   for idx in range(len(sequence['dyn/stoch']) - 1):
-    #     current_timestep = {
-    #       'dyn/deter': sequence['dyn/deter'][idx],
-    #       'dyn/stoch': sequence['dyn/stoch'][idx],\
-    #       'action': sequence['action'][idx],
-    #     }
-    #     true_next_stoch = sequence['dyn/stoch'][idx+1]
-
-    #     # Predict the next timestep based on the current timestep
-    #     state, pred_next_stoch = self._pure_pred_next({}, current_timestep, seed=self.seed, create=True)
-
-    #     # Calculate the uncertainty
-    #     pred_distr = agent.model.dyn._dist(pred_next_stoch)
-    #     true_distr = agent.model.dyn._dist(true_next_stoch)
-    #     mean_uncertainty += pred_distr.kl(true_distr)[0]
-      
-    #   mean_uncertainty /= len(sequence['dyn/stoch']) - 1
-    #   uncertainty[itemid] = mean_uncertainty
-      
-    # return uncertainty, itemids
-
-    # VECTORIZED VERSION
-    # This version is more efficient but requires a lot of memory.
     uncertainty = {}
     # Gather all sequences to process in a batch
-    itemids = self.sampler.list_items()
+    itemids = self.items.keys()
     batch_sequences = []
     for itemid in itemids:
       chunkid, index = self.items[itemid]
       sequence = self._getseq(chunkid, index, concat=True)
       batch_sequences.append(sequence)
 
+    # Check if the batch is empty
+    if not batch_sequences:
+      return {}, []
+
     # Find the maximum sequence length for batching
     max_seq_len = max(len(seq['dyn/stoch']) for seq in batch_sequences) - 1
-    batch_size = len(batch_sequences)
 
     # Pad or truncate sequences to max_seq_len
     def pad_to(seq, key, pad_value=0):
@@ -289,7 +260,7 @@ class Replay:
         except KeyError:
           pass
 
-  def _sample(self, mode, uncertainty=None):
+  def _sample(self, mode):
     assert mode in ('train', 'report', 'eval'), mode
     if mode == 'train':
       # Increment is not thread safe thus inaccurate but faster than locking.
@@ -301,10 +272,7 @@ class Replay:
           is_online = True
         else:
           with elements.timer.section('sample'):
-            if uncertainty is not None:
-              itemid = self.sampler(uncertainty)
-            else:
-              itemid = self.sampler()
+            itemid = self.sampler()
           chunkid, index = self.items[itemid]
           is_online = False
         seq = self._getseq(chunkid, index, concat=False)
