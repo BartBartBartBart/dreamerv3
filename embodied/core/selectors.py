@@ -48,8 +48,6 @@ class Uncertainty:
       raise ValueError("No itemids to sample from.")
     
     if mode == 'train':
-      # for itemid in itemids:
-        # print(f"Itemid: {itemid}, Uncertainty: {self.uncertainty[itemid]}")
       # Get the uncertainty values for the itemids.
       values = np.array([self.uncertainty[itemid] for itemid in itemids])
 
@@ -68,10 +66,11 @@ class Uncertainty:
       replace = batch_size > len(self.itemids)
       idx = self.rng.choice(len(itemids), size=batch_size, replace=replace)
       return idx
-    # print(f"Returning {idx}")
+
     return [self.itemids[id] for id in idx]
 
   def __setitem__(self, itemid, stepids, uncertainty=None):
+    # print(f"Adding itemid: {itemid}, stepids: {stepids}, uncertainty: {uncertainty}")
     with self.lock:
       if itemid not in self.itemids:
         self.itemids.append(itemid)
