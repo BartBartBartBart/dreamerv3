@@ -37,8 +37,8 @@ defaults:
     loconav: {size: [64, 64], repeat: 1, camera: -1}
 
   replay:
-    size: 5e4 #5e6
-    online: False
+    size: 5e6
+    online: True
     fracs: {uniform: 0.0, priority: 0.0, recency: 0.0, uncertainty: 1.0}
     prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
     priosignal: model
@@ -52,7 +52,7 @@ defaults:
     log_every: 120
     report_every: 300
     save_every: 900
-    update_uncertainty_every: 200
+    update_uncertainty_every: 1000
     envs: 16
     eval_envs: 4
     eval_eps: 1
@@ -162,7 +162,6 @@ dmlab:
 
 atari:
   task: atari_pong
-  # run: {steps: 240, train_ratio: 32}
   run: {steps: 5.1e7, train_ratio: 32}
 
 procgen:

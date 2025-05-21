@@ -51,6 +51,8 @@ def train_eval(
     episode.add('score', tran['reward'], agg='sum')
     episode.add('length', 1, agg='sum')
     episode.add('rewards', tran['reward'], agg='stack')
+    episode.add('mean_uncertainty', replay_train.sampler.mean, agg='avg')
+    episode.add('std_uncertainty', replay_train.sampler.std, agg='avg')
     for key, value in tran.items():
       if value.dtype == np.uint8 and value.ndim == 3:
         if worker == 0:
@@ -146,7 +148,7 @@ def train_eval(
         logger.add(mets, prefix='eval')
 
     if args.replay.fracs.uncertainty == 1.0 and should_update_uncertainty(step):
-      print(f'Updating uncertainty - step {int(step)}')
+      # print(f'Updating uncertainty - step {int(step)}')
       uncertainties, itemids = replay_train.calc_uncertainty(agent)
       replay_train.sampler.update_uncertainty(uncertainties, itemids)
 

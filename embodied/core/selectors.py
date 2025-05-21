@@ -22,7 +22,8 @@ class Uncertainty:
     self.rng = np.random.default_rng(seed)
     self.weighted_sampling = weighted_sampling
     self.uncertainty = {}
-    self.default_uncertainty = 0.1
+    self.mean = 1.0
+    self.std = 0.0
 
   def __len__(self):
     return len(self.itemids)
@@ -41,7 +42,6 @@ class Uncertainty:
     Returns:
       A list of sampled itemids.
     """
-    # print(f"Uncertainty sampling: {mode} - {batch_size}")
     with self.lock:
       itemids = list(self.itemids)
     if not itemids:
@@ -65,19 +65,17 @@ class Uncertainty:
     elif mode == 'report':
       replace = batch_size > len(self.itemids)
       idx = self.rng.choice(len(itemids), size=batch_size, replace=replace)
-      return idx
 
-    return [self.itemids[id] for id in idx]
+    return [self.itemids[id] for id in idx] if len(idx) > 1 else self.itemids[idx[0]]
 
   def __setitem__(self, itemid, stepids, uncertainty=None):
-    # print(f"Adding itemid: {itemid}, stepids: {stepids}, uncertainty: {uncertainty}")
     with self.lock:
       if itemid not in self.itemids:
         self.itemids.append(itemid)
       if uncertainty is not None:
         self.uncertainty[itemid] = uncertainty
       else: 
-       self.uncertainty[itemid] = self.default_uncertainty
+       self.uncertainty[itemid] = self.mean + self.std
 
   def __delitem__(self, itemid):
     with self.lock:
@@ -96,9 +94,8 @@ class Uncertainty:
         if uncertainty is not None:
           self.uncertainty[itemid] = uncertainty
       if self.itemids:
-        mean = np.mean(list(self.uncertainty.values()))
-        std = np.std(list(self.uncertainty.values()))
-        self.default_uncertainty = mean + std
+        self.mean = np.mean(list(self.uncertainty.values()))
+        self.std = np.std(list(self.uncertainty.values()))
 
 
 class Fifo:
