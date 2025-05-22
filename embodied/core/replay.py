@@ -76,6 +76,9 @@ class Replay:
         'updates': m['updates'],
         'replay_ratio': ratio(self.length * m['samples'], m['inserts']),
     }
+    if self.uncertainty:
+      stats['mean_uncertainty'] = self.sampler.mean
+      stats['std_uncertainty'] = self.sampler.std
     for key in self.metrics:
       self.metrics[key] = 0
     return stats
@@ -133,6 +136,7 @@ class Replay:
     data = self._annotate_batch(data, is_online, True)
     return data
   
+  @elements.timer.section('calc_uncertainty')
   def calc_uncertainty(self, agent=None):
     """
     Vectorized uncertainty calculation for each sequence in the replay buffer.
@@ -183,7 +187,6 @@ class Replay:
       }
       padded_sequences.append(padded_seq)
     batch_sequences = padded_sequences
-    seq_len = max_seq_len
 
     # Prepare batched arrays: only take the first timestep and its true next stoch
     deter = np.stack([seq['dyn/deter'][0:1] for seq in batch_sequences])      # (B, 1, ...)
@@ -202,7 +205,7 @@ class Replay:
         }
         # state is unused, pass {}
         _, pred = self._pure_pred_next({}, timestep, seed=self.seed, create=True)
-        return pred
+        return pred[0] # (1,2,4) -> (2,4)
       # Vectorize over batch and time
       return jax.vmap(jax.vmap(single_step, in_axes=(0,0,0)), in_axes=(0,0,0))(deter, stoch, actions)
 
@@ -211,15 +214,16 @@ class Replay:
     def kl_fn(pred_stoch, true_stoch):
       pred_dist = agent.model.dyn._dist(pred_stoch)
       true_dist = agent.model.dyn._dist(true_stoch)
-      return pred_dist.kl(true_dist)[0]  # or whatever shape you want
+      kl = pred_dist.kl(true_dist) # (1, )
+      return kl
 
     # Now vmap over batch and time
-    kls = jax.vmap(jax.vmap(kl_fn))(pred_next_stoch, true_next_stoch)  # (B, T)
+    kls = jax.vmap(jax.vmap(kl_fn))(pred_next_stoch, true_next_stoch)  # (B, 1)
 
     mean_uncertainty = np.array(kls).mean(axis=1)  # (B,)
 
     for i, itemid in enumerate(itemids):
-      uncertainty[itemid] = mean_uncertainty[i]
+      uncertainty[itemid] = mean_uncertainty[i] 
 
     return uncertainty, itemids
   
