@@ -28,7 +28,7 @@ class Uncertainty:
   def __len__(self):
     return len(self.itemids)
 
-  def __call__(self, uncertainty=None, batch_size=1, mode='report'):
+  def __call__(self, batch_size=1, mode='report'):
     """
     Sample an item based on uncertainty values. During uncertainty sampling, 
     sample the whole batch in one go. Pass specific itemids to avoid threading errors. 

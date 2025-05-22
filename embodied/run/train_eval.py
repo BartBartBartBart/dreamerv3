@@ -145,8 +145,9 @@ def train_eval(
         logger.add(mets, prefix='eval')
 
     if replay_train.uncertainty and should_update_uncertainty(step):
-      # print(f'Updating uncertainty - step {int(step)}')
-      uncertainties, itemids = replay_train.calc_uncertainty(agent)
+      # To prevent OOM do minibatches during calculation
+      unc_batch_size = args.replay.uncertainty_batch_size
+      uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
       replay_train.sampler.update_uncertainty(uncertainties, itemids)
 
     driver_train(train_policy, steps=10)
