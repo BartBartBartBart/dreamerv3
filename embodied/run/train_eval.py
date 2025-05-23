@@ -83,10 +83,10 @@ def train_eval(
   driver_eval.on_step(bind(logfn, mode='eval'))
   driver_eval.on_step(lambda tran, _: policy_fps.step())
 
-  if replay_train.uncertainty:
-    stream_train = iter(agent.stream(make_stream(replay_train, 'train', agent)))
-  else: 
-    stream_train = iter(agent.stream(make_stream(replay_train, 'train')))
+  # if replay_train.uncertainty:
+  stream_train = iter(agent.stream(make_stream(replay_train, 'train', agent)))
+  # else: 
+    # stream_train = iter(agent.stream(make_stream(replay_train, 'train')))
   stream_report = iter(agent.stream(make_stream(replay_train, 'report')))
   stream_eval = iter(agent.stream(make_stream(replay_eval, 'eval')))
 
@@ -144,11 +144,19 @@ def train_eval(
         carry_eval, mets = reportfn(carry_eval, stream_eval)
         logger.add(mets, prefix='eval')
 
-    if replay_train.uncertainty and should_update_uncertainty(step):
+    if args.logger.uncertainty and should_update_uncertainty(step):
       # To prevent OOM do minibatches during calculation
       unc_batch_size = args.replay.uncertainty_batch_size
       uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
-      replay_train.sampler.update_uncertainty(uncertainties, itemids)
+      if replay_train.uncertainty:
+        replay_train.sampler.update_uncertainty(uncertainties, itemids)
+        mean = replay_train.sampler.mean
+        std = replay_train.sampler.std
+      else:
+        mean = np.mean(list(uncertainties.values())) if len(uncertainties) > 0 else 1.0
+        std = np.std(list(uncertainties.values())) if len(uncertainties) > 0 else 0.0
+      logger.add({'replay/mean_uncertainty': mean})
+      logger.add({'replay/std_uncertainty': std})
 
     driver_train(train_policy, steps=10)
 

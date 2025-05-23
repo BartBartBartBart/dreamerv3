@@ -66,6 +66,7 @@ def main(argv=None):
       consec_report=config.consec_report,
       replay_context=config.replay_context,
       replay=config.replay,
+      logger=config.logger,
   )
 
   if config.script == 'train':
@@ -216,7 +217,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
   if config.replay.fracs.uncertainty == 1 and mode == 'train':
     sampler = "Uncertainty"
     kwargs['selector'] = embodied.replay.selectors.Uncertainty()
-    kwargs['pred_next'] =  pred_next
+    
 
   # Mixture
   elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
@@ -232,6 +233,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
         recency=selectors.Recency(recency),
     ), config.replay.fracs)
 
+  kwargs['pred_next'] =  pred_next
   print(f"Using {sampler} sampling for {mode}")
   return embodied.replay.Replay(**kwargs)
 

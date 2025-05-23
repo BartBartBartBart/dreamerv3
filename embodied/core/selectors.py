@@ -56,7 +56,7 @@ class Uncertainty:
         probs = values / values.sum() if values.sum() > 0 else np.ones_like(values) / len(values)
         assert np.isclose(probs.sum(), 1.0), f"Probabilities do not sum to 1: {probs.sum()}"
         idx = self.rng.choice(len(itemids), size=batch_size, p=probs)
-      
+
       # Take the top-k items based on uncertainty values.
       else:
         idx = np.argsort(values)[-batch_size:]
@@ -72,7 +72,7 @@ class Uncertainty:
     with self.lock:
       if itemid not in self.itemids:
         self.itemids.append(itemid)
-      if uncertainty is not None:
+      if uncertainty is not None: 
         self.uncertainty[itemid] = uncertainty
       else: 
        self.uncertainty[itemid] = self.mean + self.std

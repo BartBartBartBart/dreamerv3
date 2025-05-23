@@ -76,9 +76,9 @@ class Replay:
         'updates': m['updates'],
         'replay_ratio': ratio(self.length * m['samples'], m['inserts']),
     }
-    if self.uncertainty:
-      stats['mean_uncertainty'] = self.sampler.mean
-      stats['std_uncertainty'] = self.sampler.std
+    # if self.uncertainty:
+    #   stats['mean_uncertainty'] = self.sampler.mean
+    #   stats['std_uncertainty'] = self.sampler.std
     for key in self.metrics:
       self.metrics[key] = 0
     return stats
@@ -154,6 +154,7 @@ class Replay:
 
     # Assume all sequences are the same length, so no need to pad
     num_items = len(batch_sequences)
+    print(f'{num_items}, {num_items// minibatch_size} minibatches')
     for start in range(0, num_items, minibatch_size):
       end = min(start + minibatch_size, num_items)
       mb_sequences = batch_sequences[start:end]
