@@ -145,16 +145,23 @@ def train_eval(
         logger.add(mets, prefix='eval')
 
     if args.logger.uncertainty and should_update_uncertainty(step):
-      # To prevent OOM do minibatches during calculation
-      unc_batch_size = args.replay.uncertainty_batch_size
-      uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
-      if replay_train.uncertainty:
+      if replay_train.name == "uncertainty":
+        unc_batch_size = args.replay.uncertainty_batch_size
+        uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
         replay_train.sampler.update_uncertainty(uncertainties, itemids)
         mean = replay_train.sampler.mean
         std = replay_train.sampler.std
-      else:
+
+      elif replay_train.name == "priority":
+        mean = replay_train.sampler.mean
+        std = replay_train.sampler.std
+
+      elif replay_train.name == "uniform":
+        unc_batch_size = args.replay.uncertainty_batch_size
+        uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
         mean = np.mean(list(uncertainties.values())) if len(uncertainties) > 0 else 1.0
         std = np.std(list(uncertainties.values())) if len(uncertainties) > 0 else 0.0
+        
       logger.add({'replay/mean_uncertainty': mean})
       logger.add({'replay/std_uncertainty': std})
 

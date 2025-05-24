@@ -25,7 +25,6 @@ class Replay:
     self.name = name
 
     self.sampler = selector if selector is not None else selectors.Uniform(seed)
-    self.uncertainty = True if isinstance(self.sampler, selectors.Uncertainty) else False
 
     self._pure_pred_next = nj.pure(pred_next, nested=True)
     self.seed = jax.random.PRNGKey(jax.device_put(seed))
@@ -224,7 +223,7 @@ class Replay:
           is_online = True
         else:
           with elements.timer.section('sample'):
-            if self.uncertainty:
+            if self.name == "uncertainty":
               itemid = self.sampler(mode=mode)
             else:
               itemid = self.sampler()

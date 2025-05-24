@@ -198,16 +198,19 @@ def make_replay(config, folder, mode='train', pred_next=None):
   kwargs = dict(
       length=length, capacity=int(capacity), online=config.replay.online,
       chunksize=config.replay.chunksize, directory=directory)
+  kwargs['name'] = "uniform"  # Default name
 
   # Recency
   if config.replay.fracs.recency == 1 and mode == 'train':
     sampler = "Recency"
+    kwargs['name'] = 'recency'
     recency = 1.0 / np.arange(1, capacity + 1) ** config.replay.recexp
     kwargs['selector'] = embodied.replay.selectors.Recency(recency)
 
   # Priority
   elif config.replay.fracs.priority == 1 and mode == 'train':
     sampler = "Prioritized"
+    kwargs['name'] = 'priority'
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
@@ -216,12 +219,14 @@ def make_replay(config, folder, mode='train', pred_next=None):
   # Uncertainty
   if config.replay.fracs.uncertainty == 1 and mode == 'train':
     sampler = "Uncertainty"
+    kwargs['name'] = 'uncertainty'
     kwargs['selector'] = embodied.replay.selectors.Uncertainty()
     
 
   # Mixture
   elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
     sampler = "Mixture"
+    kwargs['name'] = 'mixture'
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')

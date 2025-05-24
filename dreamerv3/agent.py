@@ -151,7 +151,10 @@ class Agent(embodied.jax.Agent):
       outs['replay'] = updates
 
     if self.config.replay.fracs.priority > 0:
-      priority = losses['dyn'] + losses['rep']
+      # priority = losses['dyn'] + losses['rep']
+      priority = losses['uncertainty']
+      # jax.debug.print(
+          # 'Priority: {priority}', priority=priority)
       outs['replay']['priority'] = priority # add priority to the output
 
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})

@@ -126,10 +126,11 @@ class RSSM(nj.Module):
     post = feat['logit'] # q(z-t | o_t, h_t)
     dyn = self._dist(sg(post)).kl(self._dist(prior))
     rep = self._dist(post).kl(self._dist(sg(prior)))
+    uncertainty = self._dist(post).kl(self._dist(prior))
     if self.free_nats:
       dyn = jnp.maximum(dyn, self.free_nats)
       rep = jnp.maximum(rep, self.free_nats)
-    losses = {'dyn': dyn, 'rep': rep}
+    losses = {'dyn': dyn, 'rep': rep, 'uncertainty': uncertainty}
     metrics['dyn_ent'] = self._dist(prior).entropy().mean()
     metrics['rep_ent'] = self._dist(post).entropy().mean()
     return carry, entries, losses, feat, metrics
