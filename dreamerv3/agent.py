@@ -140,6 +140,7 @@ class Agent(embodied.jax.Agent):
         self.loss, carry, obs, prevact, training=True, has_aux=True)
     metrics.update(mets)
     self.slowval.update()
+    losses = outs['losses']
     outs = {}
     if self.config.replay_context:
       updates = elements.tree.flatdict(dict(
@@ -149,9 +150,9 @@ class Agent(embodied.jax.Agent):
           (B, T), {k: v.shape for k, v in updates.items()})
       outs['replay'] = updates
 
-    # Priority (not working)
-    # if self.config.replay.fracs.priority > 0:
-      # outs['replay']['priority'] = losses['model']
+    if self.config.replay.fracs.priority > 0:
+      priority = losses['dyn'] + losses['rep']
+      outs['replay']['priority'] = priority # add priority to the output
 
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})
     return carry, outs, metrics

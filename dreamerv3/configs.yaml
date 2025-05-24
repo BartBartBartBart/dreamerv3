@@ -119,6 +119,7 @@ defaults:
     repval_grad: True
     report: True
     report_gradnorms: False
+    replay.fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty: 0.0}
 
 size1m: &size1m
   .*\.rssm: {deter: 512, hidden: 64, classes: 4}
@@ -210,7 +211,9 @@ debug:
   report_length: 5
   jax: {platform: cpu, debug: True, prealloc: False}
   run: {envs: 4, report_every: 10, log_every: 5, save_every: 15, train_ratio: 8, debug: True}
-  replay.size: 1e4
+  replay:
+    size: 1e4
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty: 0.0}
   agent:
     .*\.bins: 5
     .*\.layers: 1
