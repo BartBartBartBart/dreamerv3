@@ -21,42 +21,81 @@ class Uncertainty:
     self.lock = threading.Lock()
     self.rng = np.random.default_rng(seed)
     self.weighted_sampling = weighted_sampling
+    self.uncertainty = {}
+    self.mean = 1.0
+    self.std = 0.0
 
   def __len__(self):
     return len(self.itemids)
 
-  def __call__(self, uncertainty=None):
+  def __call__(self, batch_size=1, mode='report'):
+    """
+    Sample an item based on uncertainty values. During uncertainty sampling, 
+    sample the whole batch in one go. Pass specific itemids to avoid threading errors. 
+    
+    Args:
+      uncertainty: A dictionary mapping itemids to uncertainty values.
+      batch_size: Number of items to sample.
+      itemids: List of itemids to sample from. If None, samples from
+        all itemids.
+        
+    Returns:
+      A list of sampled itemids.
+    """
     with self.lock:
-      if not self.itemids:
-        raise ValueError("No itemids to sample from.")
-      if uncertainty is not None:
-        values = np.array([uncertainty[itemid] for itemid in self.itemids])
-        if self.weighted_sampling:
-          if values.sum() > 0:
-            probs = values / values.sum()
-          else:
-            # print(f"values.sum() < 0")
-            np.ones_like(values) / len(values)
-          assert np.isclose(probs.sum(), 1.0), f"Probabilities do not sum to 1: {probs.sum()}"
-          idx = self.rng.choice(len(self.itemids), p=probs)
-        else:
-          idx = np.argmax(values)
-      else:
-        idx = 0
-      return self.itemids[idx]
+      itemids = list(self.itemids)
+    if not itemids:
+      raise ValueError("No itemids to sample from.")
+    
+    if mode == 'train':
+      # Get the uncertainty values for the itemids.
+      values = np.array([self.uncertainty[itemid] for itemid in itemids])
 
-  def __setitem__(self, itemid, stepids):
+      # Weighted sampling based on uncertainty values.
+      if self.weighted_sampling:
+        probs = values / values.sum() if values.sum() > 0 else np.ones_like(values) / len(values)
+        assert np.isclose(probs.sum(), 1.0), f"Probabilities do not sum to 1: {probs.sum()}"
+        idx = self.rng.choice(len(itemids), size=batch_size, p=probs)
+
+      # Take the top-k items based on uncertainty values.
+      else:
+        idx = np.argsort(values)[-batch_size:]
+
+    # Uniform sampling for reporting
+    elif mode == 'report':
+      replace = batch_size > len(self.itemids)
+      idx = self.rng.choice(len(itemids), size=batch_size, replace=replace)
+
+    return [self.itemids[id] for id in idx] if len(idx) > 1 else self.itemids[idx[0]]
+
+  def __setitem__(self, itemid, stepids, uncertainty=None):
     with self.lock:
       if itemid not in self.itemids:
         self.itemids.append(itemid)
+      if uncertainty is not None: 
+        self.uncertainty[itemid] = uncertainty
+      else: 
+       self.uncertainty[itemid] = self.mean + self.std
 
   def __delitem__(self, itemid):
     with self.lock:
-      self.itemids.remove(itemid)
+      if itemid in self.uncertainty:
+        del self.uncertainty[itemid]
+      if itemid in self.itemids:
+        self.itemids.remove(itemid)
 
   def list_items(self):
     with self.lock:
-      return self.itemids
+      return list(self.itemids)
+    
+  def update_uncertainty(self, uncertainties, itemids):
+    with self.lock:
+      for itemid, uncertainty in uncertainties.items():
+        if uncertainty is not None:
+          self.uncertainty[itemid] = uncertainty
+      if self.itemids:
+        self.mean = np.mean(list(self.uncertainty.values()))
+        self.std = np.std(list(self.uncertainty.values()))
 
 
 class Fifo:
@@ -95,7 +134,6 @@ class Uniform:
   def __call__(self):
     with self.lock:
       index = self.rng.integers(0, len(self.keys)).item()
-      # print(f"Index: {index}")
       return self.keys[index]
 
   def __setitem__(self, key, stepids):

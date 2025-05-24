@@ -3,6 +3,7 @@ import os
 import pathlib
 import sys
 from functools import partial as bind
+import threading
 
 folder = pathlib.Path(__file__).parent
 sys.path.insert(0, str(folder.parent))
@@ -65,6 +66,7 @@ def main(argv=None):
       consec_report=config.consec_report,
       replay_context=config.replay_context,
       replay=config.replay,
+      logger=config.logger,
   )
 
   if config.script == 'train':
@@ -187,6 +189,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
   consec = config.consec_train if mode == 'train' else config.consec_report
   capacity = config.replay.size if mode == 'train' else config.replay.size / 10
   length = consec * batlen + config.replay_context
+  sampler = "Uniform" # Default
   assert config.batch_size * length <= capacity
 
   directory = elements.Path(config.logdir) / folder
@@ -198,11 +201,13 @@ def make_replay(config, folder, mode='train', pred_next=None):
 
   # Recency
   if config.replay.fracs.recency == 1 and mode == 'train':
+    sampler = "Recency"
     recency = 1.0 / np.arange(1, capacity + 1) ** config.replay.recexp
     kwargs['selector'] = embodied.replay.selectors.Recency(recency)
 
   # Priority
   elif config.replay.fracs.priority == 1 and mode == 'train':
+    sampler = "Prioritized"
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
@@ -210,11 +215,13 @@ def make_replay(config, folder, mode='train', pred_next=None):
 
   # Uncertainty
   if config.replay.fracs.uncertainty == 1 and mode == 'train':
+    sampler = "Uncertainty"
     kwargs['selector'] = embodied.replay.selectors.Uncertainty()
-    kwargs['pred_next'] =  pred_next
+    
 
   # Mixture
   elif config.replay.fracs.uniform != 1 and config.replay.fracs.priority != 0 and config.replay.fracs.recency != 0 and mode == 'train':
+    sampler = "Mixture"
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
         'outputs that are incompatible with prioritized replay.')
@@ -226,6 +233,9 @@ def make_replay(config, folder, mode='train', pred_next=None):
         recency=selectors.Recency(recency),
     ), config.replay.fracs)
 
+  kwargs['pred_next'] =  pred_next
+  
+  print(f"Using {sampler} sampling for {mode}")
   return embodied.replay.Replay(**kwargs)
 
 
@@ -279,7 +289,7 @@ def wrap_env(env, config):
 
 
 def make_stream(config, replay, mode, agent=None):
-  if agent is not None:
+  if agent is not None and mode == 'train':
     # uncertainty sampling
     fn = bind(replay.sample, config.batch_size, mode, agent) 
   else:

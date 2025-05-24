@@ -6,10 +6,10 @@ import embodied
 import numpy as np
 
 
-def train(make_agent, make_replay, make_env, make_stream, make_logger, args):
+def train(make_agent, make_replay_train, make_env, make_stream, make_logger, args):
 
   agent = make_agent()
-  replay = make_replay(pred_next=agent.model.pred_next)
+  replay = make_replay_train(pred_next=agent.model.pred_next)
   logger = make_logger()
 
   logdir = elements.Path(args.logdir)
