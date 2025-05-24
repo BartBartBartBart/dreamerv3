@@ -5,7 +5,6 @@ from functools import partial as bind
 
 import elements
 import numpy as np
-import jax.numpy as jnp
 import jax
 import ninjax as nj
 
@@ -26,6 +25,7 @@ class Replay:
     self.name = name
 
     self.sampler = selector if selector is not None else selectors.Uniform(seed)
+    self.uncertainty = True if isinstance(self.sampler, selectors.Uncertainty) else False
 
     self._pure_pred_next = nj.pure(pred_next, nested=True)
     self.seed = jax.random.PRNGKey(jax.device_put(seed))
@@ -127,141 +127,64 @@ class Replay:
   def sample(self, batch, mode='train', agent=None):
     message = f'Replay buffer {self.name} is empty'
     limiters.wait(lambda: len(self.sampler), message)
-
-    # Uncertainty sampling
-    if agent is not None:
-      # Uncertainty calulation and sampling
-      uncertainty, itemids = self.calc_uncertainty(agent)
-      itemids = self.sampler(uncertainty, batch_size=batch, itemids=itemids)
-
-      # Gather sequences from itemids
-      seqs, is_online = [], []
-      for itemid in itemids:
-        chunkid, index = self.items[itemid]
-        seq = self._getseq(chunkid, index, concat=False)
-        seqs.append(seq)
-        is_online.append(False)
-
-    # Other sampling methods
-    else:
-      seqs, is_online = zip(*[self._sample(mode) for _ in range(batch)])
-
+    seqs, is_online = zip(*[self._sample(mode) for _ in range(batch)])
     data = self._assemble_batch(seqs, 0, self.length)
     data = self._annotate_batch(data, is_online, True)
     return data
   
-  def calc_uncertainty(self, agent=None):
+  @elements.timer.section('calc_uncertainty')
+  def calc_uncertainty(self, agent=None, minibatch_size=4096):
     """
-    Vectorized uncertainty calculation for each sequence in the replay buffer.
-    For each step in the sequence, we predict the stochastic representation of the next 
-    timestep and calculate the KL divergence.
-    The uncertainty is the average KL divergence over all steps in the sequence.
-
-    Args:
-      agent: The agent used to predict the next timestep.
-
-    Returns:
-      uncertainty: A dictionary mapping item IDs to their corresponding uncertainty values.
-      itemids: A list of item IDs. For threading safety, this is a copy of the item IDs in the sampler.
+    Calculate uncertainty in minibatches to avoid OOM.
     """
-    # uncertainty = {}
-    # itemids = self.sampler.list_items()
-    # for itemid in itemids:
-    #   chunkid, index = self.items[itemid]
-    #   sequence = self._getseq(chunkid, index, concat=True)
-      
-    #   # Calculate average uncertainty for the sequence
-    #   mean_uncertainty = 0
-    #   for idx in range(len(sequence['dyn/stoch']) - 1):
-    #     current_timestep = {
-    #       'dyn/deter': sequence['dyn/deter'][idx],
-    #       'dyn/stoch': sequence['dyn/stoch'][idx],\
-    #       'action': sequence['action'][idx],
-    #     }
-    #     true_next_stoch = sequence['dyn/stoch'][idx+1]
-
-    #     # Predict the next timestep based on the current timestep
-    #     state, pred_next_stoch = self._pure_pred_next({}, current_timestep, seed=self.seed, create=True)
-
-    #     # Calculate the uncertainty
-    #     pred_distr = agent.model.dyn._dist(pred_next_stoch)
-    #     true_distr = agent.model.dyn._dist(true_next_stoch)
-    #     mean_uncertainty += pred_distr.kl(true_distr)[0]
-      
-    #   mean_uncertainty /= len(sequence['dyn/stoch']) - 1
-    #   uncertainty[itemid] = mean_uncertainty
-      
-    # return uncertainty, itemids
-
-    # VECTORIZED VERSION
-    # This version is more efficient but requires a lot of memory.
     uncertainty = {}
-    # Gather all sequences to process in a batch
-    itemids = self.sampler.list_items()
+    itemids = list(self.items.keys())
     batch_sequences = []
     for itemid in itemids:
       chunkid, index = self.items[itemid]
       sequence = self._getseq(chunkid, index, concat=True)
       batch_sequences.append(sequence)
 
-    # Find the maximum sequence length for batching
-    max_seq_len = max(len(seq['dyn/stoch']) for seq in batch_sequences) - 1
-    batch_size = len(batch_sequences)
+    if not batch_sequences:
+      return {}, []
 
-    # Pad or truncate sequences to max_seq_len
-    def pad_to(seq, key, pad_value=0):
-      arr = seq[key]
-      if arr.shape[0] >= max_seq_len + 1:
-        return arr[:max_seq_len + 1]
-      pad_width = [(0, max_seq_len + 1 - arr.shape[0])] + [(0, 0)] * (arr.ndim - 1)
-      return np.pad(arr, pad_width, mode='constant', constant_values=pad_value)
+    # Assume all sequences are the same length, so no need to pad
+    num_items = len(batch_sequences)
 
-    padded_sequences = []
-    for seq in batch_sequences:
-      padded_seq = {
-        'dyn/deter': pad_to(seq, 'dyn/deter'),
-        'dyn/stoch': pad_to(seq, 'dyn/stoch'),
-        'action': pad_to(seq, 'action')
-      }
-      padded_sequences.append(padded_seq)
-    batch_sequences = padded_sequences
-    seq_len = max_seq_len
+    for start in range(0, num_items, minibatch_size):
+      end = min(start + minibatch_size, num_items)
+      mb_sequences = batch_sequences[start:end]
+      mb_itemids = itemids[start:end]
 
-    # Prepare batched arrays
-    deter = np.stack([seq['dyn/deter'][:seq_len:2] for seq in batch_sequences])  # (B, T, ...) 
-    stoch = np.stack([seq['dyn/stoch'][:seq_len:2] for seq in batch_sequences])
-    actions = np.stack([seq['action'][:seq_len:2] for seq in batch_sequences])
-    true_next_stoch = np.stack([seq['dyn/stoch'][1:seq_len+1:2] for seq in batch_sequences])
+      deter = np.stack([seq['dyn/deter'][0:1] for seq in mb_sequences])      # (B, 1, ...)
+      stoch = np.stack([seq['dyn/stoch'][0:1] for seq in mb_sequences])      # (B, 1, ...)
+      actions = np.stack([seq['action'][0:1] for seq in mb_sequences])       # (B, 1, ...)
+      true_next_stoch = np.stack([seq['dyn/stoch'][1:2] for seq in mb_sequences])  # (B, 1, ...)
 
-    # Prepare input for pred_next
-    def pred_next_batch(deter, stoch, action):
-      # deter, stoch, action: (B, T, ...)
-      def single_step(d, s, a):
-        timestep = {
-          'dyn/deter': d,
-          'dyn/stoch': s,
-          'action': a,
-        }
-        # state is unused, pass {}
-        _, pred = self._pure_pred_next({}, timestep, seed=self.seed, create=True)
-        return pred
-      # Vectorize over batch and time
-      return jax.vmap(jax.vmap(single_step, in_axes=(0,0,0)), in_axes=(0,0,0))(deter, stoch, actions)
+      def pred_next_batch(deter, stoch, action):
+        def single_step(d, s, a):
+          timestep = {
+            'dyn/deter': d,
+            'dyn/stoch': s,
+            'action': a,
+          }
+          _, pred = self._pure_pred_next({}, timestep, seed=self.seed, create=True)
+          return pred[0]
+        return jax.vmap(jax.vmap(single_step, in_axes=(0,0,0)), in_axes=(0,0,0))(deter, stoch, actions)
 
-    pred_next_stoch = pred_next_batch(deter, stoch, actions)  # (B, T, ...)
+      pred_next_stoch = pred_next_batch(deter, stoch, actions)  # (B, 1, ...)
 
-    def kl_fn(pred_stoch, true_stoch):
-      pred_dist = agent.model.dyn._dist(pred_stoch)
-      true_dist = agent.model.dyn._dist(true_stoch)
-      return pred_dist.kl(true_dist)[0]  # or whatever shape you want
+      def kl_fn(pred_stoch, true_stoch):
+        pred_dist = agent.model.dyn._dist(pred_stoch)
+        true_dist = agent.model.dyn._dist(true_stoch)
+        kl = pred_dist.kl(true_dist)
+        return kl.sum(-1) if hasattr(kl, 'shape') and len(kl.shape) > 0 else kl
 
-    # Now vmap over batch and time
-    kls = jax.vmap(jax.vmap(kl_fn))(pred_next_stoch, true_next_stoch)  # (B, T)
+      kls = jax.vmap(jax.vmap(kl_fn))(pred_next_stoch, true_next_stoch)  # (B, 1)
+      mean_uncertainty = np.array(kls).mean(axis=1)  # (B,)
 
-    mean_uncertainty = np.array(kls).mean(axis=1)  # (B,)
-
-    for i, itemid in enumerate(itemids):
-      uncertainty[itemid] = mean_uncertainty[i]
+      for i, itemid in enumerate(mb_itemids):
+        uncertainty[itemid] = mean_uncertainty[i]
 
     return uncertainty, itemids
   
@@ -289,7 +212,7 @@ class Replay:
         except KeyError:
           pass
 
-  def _sample(self, mode, uncertainty=None):
+  def _sample(self, mode):
     assert mode in ('train', 'report', 'eval'), mode
     if mode == 'train':
       # Increment is not thread safe thus inaccurate but faster than locking.
@@ -301,8 +224,8 @@ class Replay:
           is_online = True
         else:
           with elements.timer.section('sample'):
-            if uncertainty is not None:
-              itemid = self.sampler(uncertainty)
+            if self.uncertainty:
+              itemid = self.sampler(mode=mode)
             else:
               itemid = self.sampler()
           chunkid, index = self.items[itemid]
