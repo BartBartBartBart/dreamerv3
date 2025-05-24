@@ -234,6 +234,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
     ), config.replay.fracs)
 
   kwargs['pred_next'] =  pred_next
+  
   print(f"Using {sampler} sampling for {mode}")
   return embodied.replay.Replay(**kwargs)
 
