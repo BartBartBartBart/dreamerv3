@@ -153,8 +153,7 @@ def train_eval(
         std = replay_train.sampler.std
 
       elif replay_train.name == "priority":
-        mean = replay_train.sampler.mean
-        std = replay_train.sampler.std
+        mean, std = replay_train.sampler.get_stats()
 
       elif replay_train.name == "uniform":
         unc_batch_size = args.replay.uncertainty_batch_size
