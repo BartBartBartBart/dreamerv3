@@ -230,9 +230,11 @@ class Prioritized:
     self.zero_on_sample = zero_on_sample
     self.maxfrac = maxfrac
     self.tree = SampleTree(branching, seed)
-    self.prios = collections.defaultdict(lambda: self.initial)
+    self.prios = collections.defaultdict(lambda: self.mean + self.std)
     self.stepitems = collections.defaultdict(list)
     self.items = {}
+    self.mean = self.initial
+    self.std = 0.0
 
   def get_stats(self):
     mean, std = 1.0, 0.0
@@ -240,6 +242,8 @@ class Prioritized:
       prios = [p for p in self.prios.values() if np.isfinite(p)]
       mean = np.mean(prios)
       std = np.std(prios)
+    self.mean = mean
+    self.std = std
     return mean, std
 
   def prioritize(self, stepids, priorities):
