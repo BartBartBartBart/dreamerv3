@@ -59,17 +59,34 @@ To build the docker image, run (with sudo):
 ```sh
 docker build -f Dockerfile -t img .
 ```
-Then, to create the container and run the application on atari pong, run:
+Or use compose build:
+```sh
+docker compose build
+```
+
+Then, to create the container and run the application with your preferred settings:
 ```sh
 docker run -it --gpus all --rm -v ~/logdir/docker:/logdir img \
-  python dreamerv3/main.py --logdir /logdir/{timestamp} --configs atari debug
+  python dreamerv3/main.py --logdir /logdir/{timestamp} --configs atari size1m <or add config flags here>
 ```
-For other tasks, check dreamer/v3/configs.yaml to see which flags to use. 
-
 If you update the Dockerfile or the contents of its build directory, you have to rebuild the docker image. This is done with: 
 ```sh
 docker compose build
 ```
+
+## Conda
+First set up the environment:
+```sh
+conda env create -n dreamer -f requirements.txt
+conda activate dreamer
+```
+Then run the model with:
+```sh
+python dreamerv3/main.py \
+  --logdir ~/logdir/dreamer/{timestamp} \ 
+  --configs atari size1m <or add configs here> \
+```
+
 
 ## Manual
 
@@ -99,6 +116,48 @@ python -m scope.viewer --basedir ~/logdir --port 8000
 ```
 
 Scalar metrics are also writting as JSONL files.
+
+## Configs
+There are a number of preset configs you can use: 
+
+### Model sizes 
+Models are available from 1M parameters to 400M. 200M is the default.
+
+- `size1m`
+- `size12m`
+- `size25m`
+- `size50m`
+- `size100m`
+- `size200m`
+- `size400m`
+
+### Tasks
+The following tasks can be run with these config flags. Other tasks can be run by setting it manually in the `dreamerv3/configs.yaml`. 
+
+- `minecraft`
+- `dmlab`, runs the 'explore_goal_locations_small' task
+- `atari`, runs the pong game
+- `procgen`, runs the coinrun game
+- `atari100K`, runs the pong game
+- `crafter`, 
+- `dmc_proprio`, runs the walker task
+- `dmc_vision`, runs the walker task
+- `bsuite`, runs the mnist task
+- `loconav`, runs the ant maze task
+
+### Sampling methods
+To run different sampling methods for experience replay, set the following config flags: 
+
+- `uncertainty`, this runs prioritized sampling, using the uncertainty signal with the mean+std of the distribution as initial value. This is the best-performing setting and also the default.
+- `uncertainty_inf`, also prioritized sampling with the uncertainty signal, but with 'inf' as initial value.
+- `uncertainty_caching`, this runs buffer wide uncertainty calculation every 2k steps and does weighted sampling. Very slow. 
+- `uniform`, standard uniform sampling. The default method of base DreamerV3. 
+- `priority`, prioritized sampling using the dynamics and representation loss as priority signal, with 'inf' as initial value. 
+- `recency`, weighted sampling with higher probabilities for more recently added sequences. 
+
+### Debug
+For debugging, you can run use the `debug` config flag. This runs the model of 15k parameters on CPU only. 
+
 
 # Tips
 

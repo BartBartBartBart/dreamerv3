@@ -150,6 +150,7 @@ class Agent(embodied.jax.Agent):
           (B, T), {k: v.shape for k, v in updates.items()})
       outs['replay'] = updates
 
+    # Priority signal
     if self.config.replay.fracs.priority > 0:
       if self.config.replay.priosignal == "uncertainty":
         priority = losses['uncertainty']

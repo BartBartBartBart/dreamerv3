@@ -6,9 +6,9 @@ import numpy as np
 
 class UncertaintyCaching:
   """
-  Uncertainty-based sampling selector. Does weighted sampling based on
+  Uncertainty caching sampling. Does weighted sampling based on
   uncertainty values. If no uncertainty is provided, it defaults to
-  sampling the first item in the list.
+  sampling the first item in the list. Uncertainties are recomputed every N steps.
 
   Args:
     seed: Random seed for sampling.
@@ -30,17 +30,13 @@ class UncertaintyCaching:
 
   def __call__(self, batch_size=1, mode='report'):
     """
-    Sample an item based on uncertainty values. During uncertainty sampling, 
-    sample the whole batch in one go. Pass specific itemids to avoid threading errors. 
-    
+    Sample an item based on uncertainty values. 
+
     Args:
-      uncertainty: A dictionary mapping itemids to uncertainty values.
       batch_size: Number of items to sample.
-      itemids: List of itemids to sample from. If None, samples from
-        all itemids.
-        
+      mode: 'train' for training mode, 'report' for reporting mode.
     Returns:
-      A list of sampled itemids.
+      A list of sampled itemids. If batch_size is 1, returns a single itemid.
     """
     with self.lock:
       itemids = list(self.itemids)
@@ -220,6 +216,23 @@ class Recency:
 
 
 class Prioritized:
+  """
+  Prioritized sampling selector. Uses a sample tree to sample items
+  based on their priority values. The priority values can be updated
+  dynamically. The tree is built using a branching factor, which
+  determines how many children each node can have. The tree is sampled
+  using a random number generator, which can be seeded for reproducibility.
+
+  Args:
+    exponent: Exponent for the priority values. If 1.0, uses the mean
+      of the priority values. If 0.0, uses the maximum priority value.
+    initial: Initial priority value for new items. Can be mean+std or inf.
+    zero_on_sample: If True, sets the priority of sampled items to zero.
+    maxfrac: Maximum fraction of the maximum priority value to use in
+      the aggregated priority value.
+    branching: Branching factor for the sample tree.
+    seed: Random seed for sampling.
+  """
 
   def __init__(
       self, exponent=1.0, initial=1.0, zero_on_sample=False,

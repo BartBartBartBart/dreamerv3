@@ -134,7 +134,16 @@ class Replay:
   @elements.timer.section('calc_uncertainty')
   def calc_uncertainty(self, agent=None, minibatch_size=4096):
     """
-    Calculate uncertainty in minibatches to avoid OOM.
+    Calculate uncertainty for all items in replay buffer.
+    Uncertainty is defined as the KL divergence between the predicted
+    next state distribution and the true next state distribution.
+
+    Args:
+      agent: The agent to use for prediction.
+      minibatch_size: The size of the minibatch to use for uncertainty calculation.
+    Returns:
+      uncertainty: A dictionary mapping item IDs to their uncertainty values.
+      itemids: A list of item IDs in the same order as the uncertainty values.
     """
     uncertainty = {}
     itemids = list(self.items.keys())
