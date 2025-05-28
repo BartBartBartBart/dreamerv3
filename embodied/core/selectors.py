@@ -4,7 +4,7 @@ import threading
 import numpy as np
 
 
-class Uncertainty:
+class UncertaintyCaching:
   """
   Uncertainty-based sampling selector. Does weighted sampling based on
   uncertainty values. If no uncertainty is provided, it defaults to
@@ -226,11 +226,15 @@ class Prioritized:
       maxfrac=0.0, branching=16, seed=0):
     assert 0 <= maxfrac <= 1, maxfrac
     self.exponent = float(exponent)
-    self.initial = float(initial)
     self.zero_on_sample = zero_on_sample
     self.maxfrac = maxfrac
     self.tree = SampleTree(branching, seed)
-    self.prios = collections.defaultdict(lambda: self.mean + self.std)
+    if initial == "mean+std":
+      self.initial = 1.0
+      self.prios = collections.defaultdict(lambda: self.mean + self.std)
+    elif initial == "inf":
+      self.initial = float('inf')
+      self.prios = collections.defaultdict(lambda: self.initial)
     self.stepitems = collections.defaultdict(list)
     self.items = {}
     self.mean = self.initial

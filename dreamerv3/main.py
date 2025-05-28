@@ -150,6 +150,7 @@ def make_agent(config):
       report_length=config.report_length,
       replica=config.replica,
       replicas=config.replicas,
+      replay=config.replay
   ))
 
 
@@ -209,7 +210,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
 
   # Priority
   elif config.replay.fracs.priority == 1 and mode == 'train':
-    sampler = "Prioritized"
+    sampler = f"Priority w/ {config.replay.priosignal} + {config.replay.prio['initial']} initial value"
     kwargs['name'] = 'priority'
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
@@ -217,10 +218,10 @@ def make_replay(config, folder, mode='train', pred_next=None):
     kwargs['selector'] = embodied.replay.selectors.Prioritized(**config.replay.prio)
 
   # Uncertainty
-  if config.replay.fracs.uncertainty == 1 and mode == 'train':
-    sampler = "Uncertainty"
-    kwargs['name'] = 'uncertainty'
-    kwargs['selector'] = embodied.replay.selectors.Uncertainty()
+  if config.replay.fracs.uncertainty_caching == 1 and mode == 'train':
+    sampler = "Uncertainty caching"
+    kwargs['name'] = 'uncertainty caching'
+    kwargs['selector'] = embodied.replay.selectors.UncertaintyCaching()
     
 
   # Mixture

@@ -40,10 +40,10 @@ defaults:
   replay:
     size: 5e6
     online: True
-    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty: 0.0}
-    uncertainty_batch_size: 65536 #32768  
+    fracs: {uniform: 0.0, priority: 0.0, recency: 0.0, uncertainty_caching: 1.0}
+    uncertainty_batch_size: 65536
     prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
-    priosignal: model
+    priosignal: uncertainty # uncertainty or dyn+rep
     recexp: 1.0
     chunksize: 1024
 
@@ -119,7 +119,6 @@ defaults:
     repval_grad: True
     report: True
     report_gradnorms: False
-    replay.fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty: 0.0}
 
 size1m: &size1m
   .*\.rssm: {deter: 512, hidden: 64, classes: 4}
@@ -213,7 +212,6 @@ debug:
   run: {envs: 4, report_every: 10, log_every: 5, save_every: 15, train_ratio: 8, debug: True}
   replay:
     size: 1e4
-    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty: 0.0}
   agent:
     .*\.bins: 5
     .*\.layers: 1
@@ -224,3 +222,39 @@ debug:
     .*\.hidden: 3
     .*\.blocks: 4
     .*\.depth: 2
+
+# Sampling method presets  
+uncertainty:
+  replay:
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty_caching: 0.0}
+    priosignal: uncertainty
+    prio: {exponent: 0.8, maxfrac: 0.5, initial: mean+std, zero_on_sample: True}
+
+uncertainty_inf:
+  replay:
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty_caching: 0.0}
+    priosignal: uncertainty
+    prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
+
+uncertainty_caching:
+  replay:
+    fracs: {uniform: 0.0, priority: 0.0, recency: 0.0, uncertainty_caching: 1.0}
+  run:
+    update_uncertainty_every: 2000
+
+uniform:
+  replay:
+    fracs: {uniform: 1.0, priority: 0.0, recency: 0.0, uncertainty_caching: 0.0}
+  logger: 
+    uncertainty: False
+
+priority:
+  replay:
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty_caching: 0.0}
+    priosignal: dyn+rep
+
+recency:
+  replay:
+    fracs: {uniform: 0.0, priority: 0.0, recency: 1.0, uncertainty_caching: 0.0}
+  logger: 
+    uncertainty: False

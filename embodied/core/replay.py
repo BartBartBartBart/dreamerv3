@@ -223,7 +223,7 @@ class Replay:
           is_online = True
         else:
           with elements.timer.section('sample'):
-            if self.name == "uncertainty":
+            if self.name == "uncertainty caching":
               itemid = self.sampler(mode=mode)
             else:
               itemid = self.sampler()

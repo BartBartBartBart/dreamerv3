@@ -83,10 +83,7 @@ def train_eval(
   driver_eval.on_step(bind(logfn, mode='eval'))
   driver_eval.on_step(lambda tran, _: policy_fps.step())
 
-  # if replay_train.uncertainty:
-  stream_train = iter(agent.stream(make_stream(replay_train, 'train', agent)))
-  # else: 
-    # stream_train = iter(agent.stream(make_stream(replay_train, 'train')))
+  stream_train = iter(agent.stream(make_stream(replay_train, 'train', agent))) 
   stream_report = iter(agent.stream(make_stream(replay_train, 'report')))
   stream_eval = iter(agent.stream(make_stream(replay_eval, 'eval')))
 
@@ -145,7 +142,7 @@ def train_eval(
         logger.add(mets, prefix='eval')
 
     if args.logger.uncertainty and should_update_uncertainty(step):
-      if replay_train.name == "uncertainty":
+      if replay_train.name == "uncertainty caching":
         unc_batch_size = args.replay.uncertainty_batch_size
         uncertainties, itemids = replay_train.calc_uncertainty(agent, unc_batch_size)
         replay_train.sampler.update_uncertainty(uncertainties, itemids)
