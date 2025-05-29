@@ -154,8 +154,13 @@ class Agent(embodied.jax.Agent):
     if self.config.replay.fracs.priority > 0:
       if self.config.replay.priosignal == "uncertainty":
         priority = losses['uncertainty']
+
       elif self.config.replay.priosignal == "dyn+rep":
         priority = losses['dyn'] + losses['rep']
+
+      elif self.config.replay.priosignal == "dyn":
+        priority = losses['dyn']
+
       outs['replay']['priority'] = priority
 
     carry = (*carry, {k: data[k][:, -1] for k in self.act_space})

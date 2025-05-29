@@ -236,6 +236,12 @@ uncertainty_inf:
     priosignal: uncertainty
     prio: {exponent: 0.8, maxfrac: 0.5, initial: inf, zero_on_sample: True}
 
+uncertainty_clipping:
+  replay:
+    fracs: {uniform: 0.0, priority: 1.0, recency: 0.0, uncertainty_caching: 0.0}
+    priosignal: dyn
+    prio: {exponent: 0.8, maxfrac: 0.5, initial: mean+std, zero_on_sample: True}
+
 uncertainty_caching:
   replay:
     fracs: {uniform: 0.0, priority: 0.0, recency: 0.0, uncertainty_caching: 1.0}
