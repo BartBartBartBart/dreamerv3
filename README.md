@@ -81,7 +81,7 @@ For future work, the method can be tested on more diverse suites.
 
 ## Contributions:
 - Bart: Implemented all uncertainty sampling methods as well as recency sampling. Ran experiments on atari and atari100k and visualized all results. Maintained and cleaned codebase. Wrote methodology section in the paper. 
-- Fiona:
+- Fiona: Researched and implemented prioritized experience replay (in our report written as uncertainty sampling using dynamics + representation loss). Ran experiments on Atari pong, Procgen coinrun, dmc Proprioceptive and dmc vision. Wrote the results, discussion and conclusion section of the final report and collaborated on the introduction. 
 - Julia: Fixed bugs regarding JAX and priorized sampling. Fixed and ran implementation of BSuite. Collaborated on the Introduction and wrote the Related Work section.
 - Robbert:
 
