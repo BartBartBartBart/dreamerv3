@@ -46,6 +46,14 @@ increases data efficiency.
 
 ![DreamerV3 Scaling Behavior](https://user-images.githubusercontent.com/2111293/217356063-0cf06b17-89f0-4d5f-85a9-b583438c98dd.png)
 
+## Related work
+
+Other research papers citing DreamerV3 have also explored Experience Replay-related research questions. To briefly summarize them and their findings:
+
+- [Curious Replay](https://doi.org/10.48550/arXiv.2306.15934): Uses curiosity-driven prioritized experience replay (combining count-based and adversarial signals) to outperform vanilla DreamerV3 on the Crafter benchmark.
+- [WMAR](https://doi.org/10.48550/arXiv.2401.16650): Extends DreamerV3 to continual learning using a memory-efficient, distribution-matching buffer. Especially effective in environments without shared structure.
+- [Domberg & Schildbach](https://doi.org/10.48550/arXiv.2503.02552): Proposes uncertainty estimation via reconstruction error to detect unreliable policy decisions, useful for safety mechanisms like emergency stops.
+- [SimuDICE](https://doi.org/10.48550/arXiv.2412.06486): Addresses the mismatch between world model training (prediction) and usage (planning), balancing common and rare experiences via DICE-based sampling.
 
 ## Our extension
 DreamerV3 uses uniform sampling on the replay buffer to form training batches. While this is a simple and efficient approach, it treats all items in the buffer equally. In reality, some experiences can be more useful to learn from than others. We introduce uncertainty-based priority sampling. This approach leverages model uncertainty, defined as the unclipped dynamics loss, in combination with a sum-tree for efficient sampling and updating. The method uses predictions made during training to compute uncertainty values, thus requiring no additional forward passes. 
@@ -73,7 +81,7 @@ For future work, the method can be tested on more diverse suites.
 ## Contributions:
 - Bart: Implementing all uncertainty sampling methods as well as recency sampling. Ran experiments on atari and atari100k and visualized all results. Maintained and cleaned codebase. Wrote methodology section in the paper. 
 - Fiona:
-- Julia:
+- Julia: Fixed bugs regarding JAX and priorized sampling. Fixed and ran implementation of BSuite. Collaborated on the Introduction and wrote the Related Work section.
 - Robbert:
 
 # Instructions
