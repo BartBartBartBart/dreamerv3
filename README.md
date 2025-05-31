@@ -46,9 +46,39 @@ increases data efficiency.
 
 ![DreamerV3 Scaling Behavior](https://user-images.githubusercontent.com/2111293/217356063-0cf06b17-89f0-4d5f-85a9-b583438c98dd.png)
 
+
+## Our extension
+DreamerV3 uses uniform sampling on the replay buffer to form training batches. While this is a simple and efficient approach, it treats all items in the buffer equally. In reality, some experiences can be more useful to learn from than others. We introduce uncertainty-based priority sampling. This approach leverages model uncertainty, defined as the unclipped dynamics loss, in combination with a sum-tree for efficient sampling and updating. The method uses predictions made during training to compute uncertainty values, thus requiring no additional forward passes. 
+
+## Results
+We experimented with different versions of uncertainty sampling: 
+- Sum-tree with the added dynamics and representation loss as priority signal
+- Sum-tree with the clipped dynamics loss as priority signal and initial values as the mean+std of the distribution
+- Sum-tree with the unclipped dynamics loss as priority signal and initial value as `float('inf')`
+- Sum-tree with the unclipped dynamics loss as priority signal and initial value as mean+std of the distribution
+
+We compare this to two baselines: uniform sampling (base DreamerV3) and recency sampling. On the pong game from the Atari suite, we obtained the following results: 
+![Uncertainty Sampling Results](imgs/results-atari-pong.png) 
+
+The version with unclipped dynamics loss as priority signal and mean+std as initial value improves on the base DreamerV3 by obtaining a higher learning speed and quicker convergence than the original DreamerV3 model with uniform sampling, while only requiring 1 extra hour of training time. 
+
+On the BSuite and Atari100K, our method also performs better: 
+![Uncertainty Sampling other suites](imgs/plots_atari_bsuite.jpeg)
+
+## Conclusion
+This work shows that uncertainty-based priority sampling enables faster learning and quicker convergence, while only requiring minimal additional overhead. 
+
+For future work, the method can be tested on more diverse suites. 
+
+## Contributions:
+- Bart: Implementing all uncertainty sampling methods as well as recency sampling. Ran experiments on atari and atari100k and visualized all results. Maintained and cleaned codebase. Wrote methodology section in the paper. 
+- Fiona:
+- Julia:
+- Robbert:
+
 # Instructions
 
-The code has been tested on Linux and Mac and requires Python 3.11+.
+The code has been tested on Linux and Mac and requires Python 3.11+. Follow instructions below to run the model.
 
 ## Docker
 

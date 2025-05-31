@@ -6,3 +6,9 @@ __pycache__/
 MUJOCO_LOG.TXT
 ;
 logdir/
+atari/
+bsuite/
+test/
+uncertainty/
+plots/
+logs/

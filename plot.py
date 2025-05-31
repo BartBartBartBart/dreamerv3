@@ -313,6 +313,14 @@ def legend(fig, names=None, reverse=False, adjust=False, **kwargs):
     entries = {name: entries[label] for label, name in names.items()}
   if reverse:
     entries = dict(list(reversed(list(entries.items()))))
+  new_entries = {}
+  for key in entries.keys():
+    # split on _ to allow for multi-word labels
+    # if ' ' in key:
+      # entries[key] = entries[key].set_label(key.split(' ', 1)[1])
+    new_key = str(key).replace('_', ' ')
+    new_entries[new_key] = entries[key]
+  entries = new_entries
   leg = fig.legend(entries.values(), entries.keys(), **options)
   leg.get_frame().set_edgecolor('white')
   leg.set_zorder(2000)
@@ -388,14 +396,15 @@ def main(args):
     import ipdb; ipdb.set_trace()
     df.to_json(args.todf, orient='records')
     print(f'Saved {args.todf}')
-  stats = comp_stats(df, args)
+  # stats = comp_stats(df, args)
+  stats = None
   plot_runs(df, stats, args)
 
 
 if __name__ == '__main__':
   main(elements.Flags(
       pattern='**/scores.jsonl',
-      indirs=[''],
+      indirs=['~/uva/dl2/snellius/logs/atari/'],
       outdir='',
       methods='.*',
       tasks='.*',
