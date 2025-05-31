@@ -210,7 +210,7 @@ def make_replay(config, folder, mode='train', pred_next=None):
 
   # Priority
   elif config.replay.fracs.priority == 1 and mode == 'train':
-    sampler = f"Priority w/ {config.replay.priosignal} + {config.replay.prio['initial']} initial value"
+    sampler = f"Priority w/ {config.replay.priosignal} and {config.replay.prio['initial']} initial value"
     kwargs['name'] = 'priority'
     assert config.jax.compute_dtype in ('bfloat16', 'float32'), (
         'Gradient scaling for low-precision training can produce invalid loss '
