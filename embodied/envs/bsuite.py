@@ -15,12 +15,12 @@ class BSuite(embodied.Env):
     if '/' not in task:
       task = f'{task}/0'
     import bsuite
-    env = bsuite.from_checkpoint_id(task)
+    env = bsuite.load_from_id(task)
     self.num_episodes = 0
     self.max_episodes = env.bsuite_num_episodes
     self.exit_after = None
     env = from_dm.FromDM(env)
-    env = embodied.wrappers.ForceDtypes(env)
+    env = embodied.wrappers.UnifyDtypes(env)
     env = embodied.wrappers.FlattenTwoDimObs(env)
     self.env = env
 
