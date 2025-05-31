@@ -64,6 +64,7 @@ We experimented with different versions of uncertainty sampling:
 - Sum-tree with the clipped dynamics loss as priority signal and initial values as the mean+std of the distribution
 - Sum-tree with the unclipped dynamics loss as priority signal and initial value as `float('inf')`
 - Sum-tree with the unclipped dynamics loss as priority signal and initial value as mean+std of the distribution
+- Priority caching with buffer-updates every N steps (very slow, so we only ran 1.3M steps) 
 
 We compare this to two baselines: uniform sampling (base DreamerV3) and recency sampling. On the pong game from the Atari suite, we obtained the following results: 
 ![Uncertainty Sampling Results](imgs/results-atari-pong.png) 
@@ -79,7 +80,7 @@ This work shows that uncertainty-based priority sampling enables faster learning
 For future work, the method can be tested on more diverse suites. 
 
 ## Contributions:
-- Bart: Implementing all uncertainty sampling methods as well as recency sampling. Ran experiments on atari and atari100k and visualized all results. Maintained and cleaned codebase. Wrote methodology section in the paper. 
+- Bart: Implemented all uncertainty sampling methods as well as recency sampling. Ran experiments on atari and atari100k and visualized all results. Maintained and cleaned codebase. Wrote methodology section in the paper. 
 - Fiona:
 - Julia: Fixed bugs regarding JAX and priorized sampling. Fixed and ran implementation of BSuite. Collaborated on the Introduction and wrote the Related Work section.
 - Robbert:
